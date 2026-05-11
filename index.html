@@ -236,7 +236,7 @@ async function loadData() {
   try {
     const res = await fetch(DATA_URL + '?t=' + Date.now());
     const raw = await res.json();
-    DATA = raw.map(d => ({
+    DATA = raw.filter(d => d.RoleName && d.RoleName.trim() !== '').map(d => ({
       role: d.RoleName || '',
       dept: d.Department || '',
       loc: d.Location || '',
