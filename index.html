@@ -8,48 +8,20 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 body{font-family:'Segoe UI',Arial,sans-serif;background:#f1f5f9;color:#1e293b;}
-
-/* PASSWORD SCREEN */
-#pwScreen{
-  position:fixed;inset:0;background:#0f172a;
-  display:flex;align-items:center;justify-content:center;z-index:9999;
-}
-.pw-box{
-  background:#1e293b;border-radius:20px;padding:48px 40px;
-  width:380px;text-align:center;box-shadow:0 25px 60px rgba(0,0,0,0.5);
-}
-.pw-logo{
-  width:64px;height:64px;background:#2563eb;border-radius:16px;
-  display:flex;align-items:center;justify-content:center;
-  font-size:28px;font-weight:900;color:#fff;margin:0 auto 20px;
-}
+#pwScreen{position:fixed;inset:0;background:#0f172a;display:flex;align-items:center;justify-content:center;z-index:9999;}
+.pw-box{background:#1e293b;border-radius:20px;padding:48px 40px;width:380px;text-align:center;box-shadow:0 25px 60px rgba(0,0,0,0.5);}
+.pw-logo{width:64px;height:64px;background:#2563eb;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:900;color:#fff;margin:0 auto 20px;}
 .pw-title{color:#f8fafc;font-size:22px;font-weight:700;margin-bottom:6px;}
 .pw-sub{color:#94a3b8;font-size:13px;margin-bottom:28px;}
-.pw-input{
-  width:100%;padding:13px 16px;background:#0f172a;
-  border:2px solid #334155;border-radius:10px;
-  color:#f8fafc;font-size:15px;outline:none;margin-bottom:14px;
-  transition:border 0.2s;
-}
+.pw-badge{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:12px;font-size:11px;font-weight:600;background:#052e16;color:#4ade80;border:1px solid #166534;margin-bottom:24px;}
+.pw-dot{width:7px;height:7px;border-radius:50%;background:#4ade80;animation:blink 1.5s infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+.pw-input{width:100%;padding:13px 16px;background:#0f172a;border:2px solid #334155;border-radius:10px;color:#f8fafc;font-size:15px;outline:none;margin-bottom:14px;transition:border 0.2s;}
 .pw-input:focus{border-color:#2563eb;}
-.pw-btn{
-  width:100%;padding:13px;background:#2563eb;border:none;
-  border-radius:10px;color:#fff;font-size:15px;font-weight:700;
-  cursor:pointer;transition:background 0.2s;
-}
+.pw-btn{width:100%;padding:13px;background:#2563eb;border:none;border-radius:10px;color:#fff;font-size:15px;font-weight:700;cursor:pointer;transition:background 0.2s;}
 .pw-btn:hover{background:#1d4ed8;}
 .pw-err{color:#f87171;font-size:13px;margin-top:10px;display:none;}
-.pw-badge{
-  display:inline-flex;align-items:center;gap:6px;
-  padding:5px 12px;border-radius:12px;font-size:11px;font-weight:600;
-  background:#052e16;color:#4ade80;border:1px solid #166534;margin-bottom:24px;
-}
-.pw-dot{width:7px;height:7px;border-radius:50%;background:#4ade80;animation:blink 1.5s infinite;}
-
-/* MAIN DASHBOARD */
 #dashboard{display:none;}
-
-/* HEADER */
 .hdr{background:#0f172a;padding:16px 36px;display:flex;justify-content:space-between;align-items:center;}
 .hdr-l{display:flex;align-items:center;gap:14px;}
 .logo{width:44px;height:44px;background:#2563eb;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:19px;font-weight:900;}
@@ -62,21 +34,14 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#f1f5f9;color:#1e293b;}
 .dot{width:7px;height:7px;border-radius:50%;}
 .dot-g{background:#4ade80;animation:blink 1.5s infinite;}
 .dot-b{background:#60a5fa;}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
 .hdr-r{text-align:right;}
 .clock{color:#f8fafc;font-size:22px;font-weight:800;letter-spacing:1px;}
 .dateln{color:#94a3b8;font-size:12px;margin-top:3px;}
-
-/* TABS */
 .tabs{background:#fff;border-bottom:2px solid #e2e8f0;padding:0 36px;display:flex;}
 .tab{padding:13px 20px;background:none;border:none;cursor:pointer;font-size:13px;font-weight:600;color:#64748b;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all 0.2s;}
 .tab:hover{color:#1e3a5f;}
 .tab.active{color:#2563eb;border-bottom-color:#2563eb;}
-
-/* MAIN */
 .main{padding:24px 36px;}
-
-/* KPI */
 .kpi-row{display:grid;grid-template-columns:repeat(6,1fr);gap:14px;margin-bottom:22px;}
 .kpi{background:#fff;border-radius:14px;padding:18px 16px;box-shadow:0 1px 6px rgba(0,0,0,0.07);border-top:4px solid #e2e8f0;}
 .kpi-ico{font-size:22px;display:block;margin-bottom:8px;}
@@ -88,41 +53,29 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#f1f5f9;color:#1e293b;}
 .kpi.c4{border-top-color:#7c3aed;}.kpi.c4 .kpi-num{color:#7c3aed;}
 .kpi.c5{border-top-color:#d97706;}.kpi.c5 .kpi-num{color:#d97706;}
 .kpi.c6{border-top-color:#059669;}.kpi.c6 .kpi-num{color:#059669;}
-
-/* PANELS */
 .panel{display:none;}
 .panel.active{display:block;}
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px;}
-
-/* CARD */
 .card{background:#fff;border-radius:14px;padding:22px;box-shadow:0 1px 6px rgba(0,0,0,0.07);}
 .card h3{font-size:14px;font-weight:700;color:#0f172a;margin-bottom:18px;padding-bottom:12px;border-bottom:1px solid #f1f5f9;}
 .ch{position:relative;height:250px;}
-
-/* FUNNEL */
 .fr{display:flex;align-items:center;gap:12px;margin-bottom:10px;}
 .fl{width:150px;font-size:12px;font-weight:600;color:#475569;text-align:right;flex-shrink:0;}
 .ft{flex:1;background:#f1f5f9;border-radius:8px;height:30px;overflow:hidden;}
 .fb{height:100%;border-radius:8px;display:flex;align-items:center;justify-content:flex-end;padding-right:10px;min-width:36px;}
 .fb span{color:#fff;font-size:12px;font-weight:800;}
 .fv{width:32px;font-size:13px;font-weight:800;color:#0f172a;text-align:right;flex-shrink:0;}
-
-/* SYNC */
 .si{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #f8fafc;}
 .si:last-child{border:none;}
 .sk{font-size:13px;color:#64748b;}
 .sv{font-size:13px;font-weight:700;color:#0f172a;}
 .sv.grn{color:#059669;}.sv.blu{color:#2563eb;}
-
-/* LOC BARS */
 .lb{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
 .ll{width:120px;font-size:12px;font-weight:600;color:#475569;flex-shrink:0;}
 .lt{flex:1;background:#f1f5f9;border-radius:8px;height:24px;overflow:hidden;}
 .lbar{height:100%;border-radius:8px;display:flex;align-items:center;padding-left:10px;}
 .lbar span{color:#fff;font-size:11px;font-weight:700;}
 .lp{width:36px;font-size:11px;font-weight:700;color:#475569;text-align:right;flex-shrink:0;}
-
-/* TABLE */
 table{width:100%;border-collapse:collapse;font-size:12px;}
 thead tr{background:#0f172a;}
 thead th{padding:10px 12px;color:#fff;text-align:left;font-size:11px;font-weight:600;white-space:nowrap;}
@@ -135,12 +88,8 @@ tbody td{padding:9px 12px;color:#374151;vertical-align:middle;}
 .pg{background:#d1fae5;color:#065f46;}
 .po{background:#fef3c7;color:#92400e;}
 .pr{background:#fee2e2;color:#991b1b;}
-
 .insight{margin-top:18px;padding:13px 16px;background:#eff6ff;border-left:4px solid #2563eb;border-radius:8px;font-size:13px;color:#1e40af;line-height:1.6;}
-
-/* REC TABLE */
-.rec-t thead tr{background:#0f172a;}
-.rec-t tbody td{padding:10px 14px;}
+.loading{text-align:center;padding:40px;color:#64748b;font-size:14px;}
 </style>
 </head>
 <body>
@@ -160,264 +109,220 @@ tbody td{padding:9px 12px;color:#374151;vertical-align:middle;}
 
 <!-- DASHBOARD -->
 <div id="dashboard">
-
-<!-- HEADER -->
-<div class="hdr">
-  <div class="hdr-l">
-    <div class="logo">S</div>
-    <div>
-      <div class="hdr-title">Skan AI — Hiring Dashboard</div>
-      <div class="hdr-sub">Live data from Keka ATS via Power Automate</div>
+  <div class="hdr">
+    <div class="hdr-l">
+      <div class="logo">S</div>
+      <div>
+        <div class="hdr-title">Skan AI — Hiring Dashboard</div>
+        <div class="hdr-sub">Live data from Keka ATS via Power Automate</div>
+      </div>
+      <div class="badges">
+        <span class="bdg bdg-g"><span class="dot dot-g"></span>Live — Keka Connected</span>
+        <span class="bdg bdg-b"><span class="dot dot-b"></span>Keka ATS Syncing</span>
+      </div>
     </div>
-    <div class="badges">
-      <span class="bdg bdg-g"><span class="dot dot-g"></span>Live — Keka Connected</span>
-      <span class="bdg bdg-b"><span class="dot dot-b"></span>Keka ATS Syncing</span>
+    <div class="hdr-r">
+      <div class="clock" id="clock">00:00:00</div>
+      <div class="dateln" id="dateln"></div>
     </div>
   </div>
-  <div class="hdr-r">
-    <div class="clock" id="clock">00:00:00</div>
-    <div class="dateln" id="dateln"></div>
-  </div>
-</div>
 
-<!-- TABS -->
-<div class="tabs">
-  <button class="tab active" onclick="sw('overview',this)">📊 Overview</button>
-  <button class="tab" onclick="sw('funnel',this)">🎯 Hiring Funnel</button>
-  <button class="tab" onclick="sw('recruiter',this)">👤 Recruiter Workload</button>
-  <button class="tab" onclick="sw('location',this)">📍 Location Breakdown</button>
-  <button class="tab" onclick="sw('roles',this)">📋 All Roles</button>
-</div>
-
-<div class="main">
-
-  <!-- KPI -->
-  <div class="kpi-row">
-    <div class="kpi c1"><span class="kpi-ico">💼</span><span class="kpi-num" id="k1">0</span><span class="kpi-lbl">Total Roles</span></div>
-    <div class="kpi c2"><span class="kpi-ico">👥</span><span class="kpi-num" id="k2">0</span><span class="kpi-lbl">Total Headcount</span></div>
-    <div class="kpi c3"><span class="kpi-ico">1️⃣</span><span class="kpi-num" id="k3">0</span><span class="kpi-lbl">In Round 1</span></div>
-    <div class="kpi c4"><span class="kpi-ico">2️⃣</span><span class="kpi-num" id="k4">0</span><span class="kpi-lbl">In Round 2</span></div>
-    <div class="kpi c5"><span class="kpi-ico">🤝</span><span class="kpi-num" id="k5">0</span><span class="kpi-lbl">HR Round</span></div>
-    <div class="kpi c6"><span class="kpi-ico">✅</span><span class="kpi-num" id="k6">0</span><span class="kpi-lbl">Preboarding</span></div>
+  <div class="tabs">
+    <button class="tab active" onclick="sw('overview',this)">📊 Overview</button>
+    <button class="tab" onclick="sw('funnel',this)">🎯 Hiring Funnel</button>
+    <button class="tab" onclick="sw('recruiter',this)">👤 Recruiter Workload</button>
+    <button class="tab" onclick="sw('location',this)">📍 Location Breakdown</button>
+    <button class="tab" onclick="sw('roles',this)">📋 All Roles</button>
   </div>
 
-  <!-- OVERVIEW -->
-  <div id="panel-overview" class="panel active">
-    <div class="g2">
-      <div class="card"><h3>🏢 Open Roles by Department</h3><div class="ch"><canvas id="deptC"></canvas></div></div>
-      <div class="card"><h3>📍 Headcount by Location</h3><div class="ch"><canvas id="locC"></canvas></div></div>
+  <div class="main">
+    <div class="kpi-row">
+      <div class="kpi c1"><span class="kpi-ico">💼</span><span class="kpi-num" id="k1">—</span><span class="kpi-lbl">Total Roles</span></div>
+      <div class="kpi c2"><span class="kpi-ico">👥</span><span class="kpi-num" id="k2">—</span><span class="kpi-lbl">Total Headcount</span></div>
+      <div class="kpi c3"><span class="kpi-ico">1️⃣</span><span class="kpi-num" id="k3">—</span><span class="kpi-lbl">In Round 1</span></div>
+      <div class="kpi c4"><span class="kpi-ico">2️⃣</span><span class="kpi-num" id="k4">—</span><span class="kpi-lbl">In Round 2</span></div>
+      <div class="kpi c5"><span class="kpi-ico">🤝</span><span class="kpi-num" id="k5">—</span><span class="kpi-lbl">HR Round</span></div>
+      <div class="kpi c6"><span class="kpi-ico">✅</span><span class="kpi-num" id="k6">—</span><span class="kpi-lbl">Preboarding</span></div>
     </div>
-    <div class="g2">
-      <div class="card"><h3>🎯 Hiring Stage Summary</h3><div id="fov"></div></div>
+
+    <div id="panel-overview" class="panel active">
+      <div class="g2">
+        <div class="card"><h3>🏢 Open Roles by Department</h3><div class="ch"><canvas id="deptC"></canvas></div></div>
+        <div class="card"><h3>📍 Headcount by Location</h3><div class="ch"><canvas id="locC"></canvas></div></div>
+      </div>
+      <div class="g2">
+        <div class="card"><h3>🎯 Hiring Stage Summary</h3><div id="fov"></div></div>
+        <div class="card">
+          <h3>🔄 Sync Information</h3>
+          <div class="si"><span class="sk">Data Source</span><span class="sv">Keka ATS</span></div>
+          <div class="si"><span class="sk">Sync Frequency</span><span class="sv blu">Every 1 Hour</span></div>
+          <div class="si"><span class="sk">Total Roles</span><span class="sv" id="si1">—</span></div>
+          <div class="si"><span class="sk">Total Headcount</span><span class="sv" id="si2">—</span></div>
+          <div class="si"><span class="sk">Last Sync</span><span class="sv" id="si3">—</span></div>
+          <div class="si"><span class="sk">Connection</span><span class="sv grn">✅ Active</span></div>
+          <div class="si"><span class="sk">Platform</span><span class="sv">Power Automate → GitHub → Netlify</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="panel-funnel" class="panel">
       <div class="card">
-        <h3>🔄 Sync Information</h3>
-        <div class="si"><span class="sk">Data Source</span><span class="sv">Keka ATS</span></div>
-        <div class="si"><span class="sk">Sync Frequency</span><span class="sv blu">Every 1 Hour</span></div>
-        <div class="si"><span class="sk">Total Roles</span><span class="sv" id="si1">—</span></div>
-        <div class="si"><span class="sk">Total Headcount</span><span class="sv" id="si2">—</span></div>
-        <div class="si"><span class="sk">Last Updated</span><span class="sv" id="si3">—</span></div>
-        <div class="si"><span class="sk">Connection</span><span class="sv grn">✅ Active</span></div>
-        <div class="si"><span class="sk">Platform</span><span class="sv">Power Automate</span></div>
+        <h3>🎯 Full Hiring Pipeline Funnel</h3>
+        <div id="ffl" style="max-width:680px;margin:0 auto;padding-top:8px;"></div>
+        <div class="insight" id="fins"></div>
       </div>
     </div>
-  </div>
 
-  <!-- FUNNEL -->
-  <div id="panel-funnel" class="panel">
-    <div class="card">
-      <h3>🎯 Full Hiring Pipeline Funnel</h3>
-      <div id="ffl" style="max-width:680px;margin:0 auto;padding-top:8px;"></div>
-      <div class="insight" id="fins"></div>
-    </div>
-  </div>
-
-  <!-- RECRUITER -->
-  <div id="panel-recruiter" class="panel">
-    <div class="g2">
-      <div class="card"><h3>👤 Roles per Recruiter</h3><div class="ch"><canvas id="recRC"></canvas></div></div>
-      <div class="card"><h3>👥 Headcount per Recruiter</h3><div class="ch"><canvas id="recHC"></canvas></div></div>
-    </div>
-    <div class="card">
-      <h3>📋 Recruiter Summary</h3>
-      <table class="rec-t">
-        <thead><tr><th>Recruiter</th><th>Roles</th><th>Total HC</th><th>Round 1</th><th>Round 2</th><th>HR Round</th><th>Preboarding</th></tr></thead>
-        <tbody id="recTb"></tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- LOCATION -->
-  <div id="panel-location" class="panel">
-    <div class="g2">
-      <div class="card"><h3>📍 Headcount by Location</h3><div class="ch"><canvas id="locP"></canvas></div></div>
-      <div class="card"><h3>📊 Location Breakdown</h3><div id="locB" style="padding-top:6px;"></div></div>
-    </div>
-  </div>
-
-  <!-- ALL ROLES -->
-  <div id="panel-roles" class="panel">
-    <div class="card" style="padding:0;overflow:hidden;">
-      <div style="background:#0f172a;padding:13px 22px;display:flex;justify-content:space-between;align-items:center;border-radius:14px 14px 0 0;">
-        <span style="color:#fff;font-size:14px;font-weight:700;">📋 All Active Roles</span>
-        <span style="color:#60a5fa;font-size:12px;font-weight:600;" id="rCount"></span>
+    <div id="panel-recruiter" class="panel">
+      <div class="g2">
+        <div class="card"><h3>👤 Roles per Recruiter</h3><div class="ch"><canvas id="recRC"></canvas></div></div>
+        <div class="card"><h3>👥 Headcount per Recruiter</h3><div class="ch"><canvas id="recHC"></canvas></div></div>
       </div>
-      <div style="overflow-x:auto;">
+      <div class="card">
+        <h3>📋 Recruiter Summary</h3>
         <table>
-          <thead><tr><th>#</th><th>Role Name</th><th>Department</th><th>Location</th><th>Recruiter</th><th>HC</th><th>R1</th><th>R2</th><th>FH</th><th>HR</th><th>Preboard</th></tr></thead>
-          <tbody id="rolesTb"></tbody>
+          <thead><tr><th>Recruiter</th><th>Roles</th><th>Total HC</th><th>Round 1</th><th>Round 2</th><th>HR Round</th><th>Preboarding</th></tr></thead>
+          <tbody id="recTb"></tbody>
         </table>
       </div>
     </div>
-  </div>
 
+    <div id="panel-location" class="panel">
+      <div class="g2">
+        <div class="card"><h3>📍 Headcount by Location</h3><div class="ch"><canvas id="locP"></canvas></div></div>
+        <div class="card"><h3>📊 Location Breakdown</h3><div id="locB" style="padding-top:6px;"></div></div>
+      </div>
+    </div>
+
+    <div id="panel-roles" class="panel">
+      <div class="card" style="padding:0;overflow:hidden;">
+        <div style="background:#0f172a;padding:13px 22px;display:flex;justify-content:space-between;align-items:center;border-radius:14px 14px 0 0;">
+          <span style="color:#fff;font-size:14px;font-weight:700;">📋 All Active Roles</span>
+          <span style="color:#60a5fa;font-size:12px;font-weight:600;" id="rCount"></span>
+        </div>
+        <div style="overflow-x:auto;">
+          <table>
+            <thead><tr><th>#</th><th>Role Name</th><th>Department</th><th>Location</th><th>Recruiter</th><th>HC</th><th>R1</th><th>R2</th><th>FH</th><th>HR</th><th>Preboard</th></tr></thead>
+            <tbody id="rolesTb"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
-</div><!-- /dashboard -->
 
 <script>
-// PASSWORD
 const PASSWORD = "Skan@2026";
-function checkPw(){
-  const v=document.getElementById('pwInput').value;
-  const err=document.getElementById('pwErr');
-  if(v===PASSWORD){
-    document.getElementById('pwScreen').style.display='none';
-    document.getElementById('dashboard').style.display='block';
-    initDashboard();
+const DATA_URL = "https://raw.githubusercontent.com/ArpitSkan/skan-hiring-dashboard/main/data.json";
+const COLS = ['#1e3a5f','#2563eb','#3b82f6','#0891b2','#7c3aed','#059669','#d97706','#dc2626','#0f766e','#9333ea'];
+let DATA = [];
+let charts = {};
+
+function checkPw() {
+  const v = document.getElementById('pwInput').value;
+  const err = document.getElementById('pwErr');
+  if (v === PASSWORD) {
+    document.getElementById('pwScreen').style.display = 'none';
+    document.getElementById('dashboard').style.display = 'block';
+    loadData();
   } else {
-    err.style.display='block';
-    document.getElementById('pwInput').value='';
+    err.style.display = 'block';
+    document.getElementById('pwInput').value = '';
     document.getElementById('pwInput').focus();
   }
 }
 
-// DATA - All 56 real roles
-const DATA=[
-  {role:"Data Scientist I",dept:"Data Science",loc:"Bengaluru",rec:"",hc:2,r1:0,r2:0,fh:0,hr:0,pb:0},
-  {role:"Intern - AI Engineer",dept:"Engineering",loc:"",rec:"",hc:1,r1:0,r2:0,fh:0,hr:0,pb:0},
-  {role:"VP, Technology Platform and Architecture",dept:"Platform Engineering Services",loc:"",rec:"",hc:1,r1:0,r2:0,fh:0,hr:0,pb:0},
-  {role:"Vice President, Channel Sales & Global Strategic Alliances",dept:"Partnerships",loc:"California",rec:"Arpit Mishra",hc:1,r1:0,r2:0,fh:0,hr:0,pb:0},
-  {role:"Sr. Director, AI Transformation & Enterprise Value",dept:"Customer Strategy & Operations",loc:"na",rec:"Arpit Mishra",hc:1,r1:4,r2:0,fh:0,hr:0,pb:0},
-  {role:"Sr. Director, AI Transformation & Enterprise Value",dept:"Customer Strategy & Operations",loc:"California",rec:"Arpit Mishra",hc:1,r1:5,r2:0,fh:0,hr:0,pb:0},
-  {role:"Intern - Data Science",dept:"Data Science",loc:"Bengaluru",rec:"",hc:9,r1:0,r2:0,fh:0,hr:0,pb:4},
-  {role:"AI Engineer",dept:"Data Science",loc:"Bengaluru",rec:"Hitesh Reddy S",hc:3,r1:0,r2:0,fh:0,hr:0,pb:0},
-  {role:"Customer Success Manager",dept:"Customer Transformation Organization",loc:"California",rec:"Arpit Mishra",hc:1,r1:1,r2:0,fh:0,hr:0,pb:0},
-  {role:"Principal - Customer Success & Transformation",dept:"Customer Success and Services",loc:"na",rec:"Arpit Mishra",hc:1,r1:3,r2:1,fh:0,hr:0,pb:0},
-  {role:"Head of Content Marketing",dept:"Marketing",loc:"California",rec:"Arpit Mishra",hc:1,r1:0,r2:0,fh:0,hr:0,pb:0},
-  {role:"Agentic Solutions Manager",dept:"Engineering",loc:"California",rec:"",hc:1,r1:0,r2:0,fh:0,hr:0,pb:0},
-  {role:"Sr. Content Writer",dept:"Marketing",loc:"California",rec:"Arpit Mishra",hc:1,r1:0,r2:0,fh:0,hr:0,pb:0},
-  {role:"Software Engineer",dept:"Engineering",loc:"California",rec:"Hitesh Reddy S",hc:5,r1:0,r2:3,fh:0,hr:0,pb:0},
-  {role:"Lead DevOps Engineer",dept:"Platform Engineering Services",loc:"Bengaluru",rec:"Hitesh Reddy S",hc:1,r1:0,r2:0,fh:0,hr:0,pb:1},
-  {role:"Sr DevOps Engineer",dept:"Platform Engineering Services",loc:"Bengaluru",rec:"Arpit Mishra",hc:2,r1:2,r2:0,fh:0,hr:0,pb:0},
-  {role:"Director - Technical Product Management",dept:"Engineering",loc:"California",rec:"Arpit Mishra",hc:1,r1:2,r2:2,fh:0,hr:0,pb:0},
-  {role:"Content Creator and Video Editor",dept:"Platform Engineering Services",loc:"Bengaluru",rec:"Hitesh Reddy S",hc:1,r1:0,r2:0,fh:0,hr:0,pb:0},
-  {role:"Database Administrator (PostgresSQL)",dept:"Engineering",loc:"Bengaluru",rec:"Hitesh Reddy S",hc:2,r1:0,r2:0,fh:0,hr:0,pb:0},
-  {role:"Vice President – Platform Delivery and Architecture",dept:"Platform Engineering Services",loc:"",rec:"Hitesh Reddy S",hc:1,r1:1,r2:0,fh:0,hr:0,pb:0},
-  {role:"Sr. AI Architect",dept:"Engineering",loc:"Bengaluru",rec:"Arpit Mishra",hc:1,r1:1,r2:0,fh:0,hr:0,pb:0},
-  {role:"Marketing Specialist- Graphic Designer",dept:"Marketing",loc:"Bengaluru",rec:"Hitesh Reddy S",hc:1,r1:0,r2:0,fh:0,hr:0,pb:0},
-  {role:"Data Analyst III",dept:"Platform Engineering Services",loc:"Bengaluru",rec:"Hitesh Reddy S",hc:1,r1:0,r2:0,fh:1,hr:0,pb:0},
-  {role:"Strategic Enterprise Account Executive",dept:"Sales and Business Operations",loc:"California",rec:"Arpit Mishra",hc:1,r1:2,r2:1,fh:1,hr:0,pb:0},
-  {role:"Sr. Web Engineer",dept:"Marketing",loc:"Bengaluru",rec:"Gregory Batchelor",hc:1,r1:1,r2:0,fh:0,hr:0,pb:0},
-  {role:"Lead Software Development Engineer (Python)",dept:"Data Science",loc:"Bengaluru",rec:"Hitesh Reddy S",hc:1,r1:1,r2:2,fh:0,hr:0,pb:0},
-  {role:"Sr Software Development Engineer (Python)",dept:"Data Science",loc:"Bengaluru",rec:"Hitesh Reddy S",hc:2,r1:1,r2:0,fh:0,hr:2,pb:0},
-  {role:"Sr Software Development Engineer (Python)",dept:"Engineering",loc:"Bengaluru",rec:"Hitesh Reddy S",hc:2,r1:5,r2:0,fh:0,hr:1,pb:0},
-  {role:"Sr Software Development Engineer (Angular)",dept:"Engineering",loc:"Bengaluru",rec:"Hitesh Reddy S",hc:1,r1:0,r2:0,fh:0,hr:0,pb:0},
-  {role:"Lead Software Development Engineer (Python)",dept:"Engineering",loc:"Bengaluru",rec:"Hitesh Reddy S",hc:1,r1:4,r2:0,fh:0,hr:0,pb:1},
-  {role:"Performance Test Engineer",dept:"Quality Assurance",loc:"Bengaluru",rec:"Hitesh Reddy S",hc:1,r1:0,r2:0,fh:0,hr:0,pb:0},
-  {role:"Enterprise Sales Manager",dept:"Sales and Business Operations",loc:"na",rec:"Arpit Mishra",hc:1,r1:0,r2:2,fh:3,hr:0,pb:0},
-  {role:"POC Success Lead",dept:"Customer Transformation Organization",loc:"Bengaluru",rec:"Arpit Mishra",hc:1,r1:0,r2:0,fh:0,hr:0,pb:0},
-  {role:"Director of Product Marketing",dept:"Marketing",loc:"California",rec:"Arpit Mishra",hc:1,r1:1,r2:1,fh:0,hr:0,pb:0},
-  {role:"Director - Customer Transformation (Insurance)",dept:"Customer Transformation Organization",loc:"California",rec:"Arpit Mishra",hc:1,r1:0,r2:0,fh:1,hr:1,pb:0},
-  {role:"Sr. Program Manager",dept:"Customer Transformation Organization",loc:"Bengaluru",rec:"Arpit Mishra",hc:1,r1:0,r2:0,fh:0,hr:0,pb:0},
-  {role:"Lead Process Data Consultant II",dept:"Platform Engineering Services",loc:"California",rec:"Hitesh Reddy S",hc:1,r1:0,r2:1,fh:1,hr:1,pb:0},
-  {role:"Process Data Consultant III",dept:"Platform Engineering Services",loc:"na",rec:"Hitesh Reddy S",hc:1,r1:0,r2:0,fh:0,hr:0,pb:0},
-  {role:"Customer Success and Services Analyst",dept:"Platform Engineering Services",loc:"Bengaluru",rec:"Ramakrishna Vellala",hc:1,r1:0,r2:0,fh:0,hr:1,pb:0},
-  {role:"Sr. Channel Sales Manager",dept:"Partnerships",loc:"California",rec:"Arpit Mishra",hc:1,r1:2,r2:0,fh:0,hr:0,pb:0},
-  {role:"Director - Professional Services",dept:"Platform Engineering Services",loc:"California",rec:"Ramakrishna Vellala",hc:2,r1:2,r2:0,fh:0,hr:0,pb:0},
-  {role:"IT Manager",dept:"Engineering",loc:"",rec:"Hitesh Reddy S",hc:1,r1:0,r2:0,fh:0,hr:0,pb:0},
-  {role:"Site Reliability Engineer (SRE) & Support",dept:"Platform Engineering Services",loc:"",rec:"Hitesh Reddy S",hc:2,r1:0,r2:0,fh:0,hr:0,pb:0},
-  {role:"Systems Engineer",dept:"Platform Engineering Services",loc:"",rec:"Hitesh Reddy S",hc:2,r1:0,r2:0,fh:0,hr:0,pb:0},
-  {role:"Lead Systems Engineer",dept:"Platform Engineering Services",loc:"",rec:"Hitesh Reddy S",hc:1,r1:2,r2:0,fh:0,hr:1,pb:0},
-  {role:"Director – Technical Account Management",dept:"Engineering Services",loc:"California",rec:"Hitesh Reddy S",hc:3,r1:0,r2:0,fh:0,hr:0,pb:0},
-  {role:"AI Research Engineer – Agentic AI",dept:"Engineering",loc:"California",rec:"",hc:1,r1:0,r2:0,fh:0,hr:0,pb:0},
-  {role:"Process Data Consultant III",dept:"Platform Engineering Services",loc:"California",rec:"Hitesh Reddy S",hc:3,r1:0,r2:0,fh:0,hr:1,pb:0},
-  {role:"Director - Customer Transformation",dept:"Customer Success and Services",loc:"",rec:"Arpit Mishra",hc:1,r1:1,r2:0,fh:0,hr:0,pb:1},
-  {role:"Director- Customer Success (Healthcare)",dept:"Customer Success and Services",loc:"Raleigh",rec:"Arpit Mishra",hc:1,r1:0,r2:0,fh:2,hr:0,pb:0},
-  {role:"Program Manager",dept:"Customer Success and Services",loc:"California",rec:"Arpit Mishra",hc:4,r1:2,r2:3,fh:0,hr:0,pb:0},
-  {role:"Program Manager",dept:"Customer Success and Services",loc:"",rec:"Arpit Mishra",hc:5,r1:0,r2:0,fh:0,hr:0,pb:0},
-  {role:"Lead Software Development Engineer (Python)",dept:"Engineering",loc:"",rec:"Chandrashekhar Kanaki",hc:3,r1:0,r2:0,fh:0,hr:0,pb:0},
-  {role:"Senior Frontend Engineer",dept:"Engineering",loc:"",rec:"Sumit Kumar",hc:1,r1:0,r2:1,fh:0,hr:0,pb:0},
-  {role:"AI Engineer",dept:"Data Science",loc:"",rec:"Hitesh Reddy S",hc:4,r1:0,r2:0,fh:0,hr:0,pb:0},
-  {role:"Software Development Engineer In Test (SDET)",dept:"Engineering",loc:"Bengaluru",rec:"Hitesh Reddy S",hc:6,r1:1,r2:0,fh:0,hr:0,pb:0},
-];
+async function loadData() {
+  try {
+    const res = await fetch(DATA_URL + '?t=' + Date.now());
+    const raw = await res.json();
+    DATA = raw.map(d => ({
+      role: d.RoleName || '',
+      dept: d.Department || '',
+      loc: d.Location || '',
+      rec: d.Recruiter || '',
+      hc: parseInt(d.TotalHC) || 0,
+      r1: parseInt(d['Round 1']) || 0,
+      r2: parseInt(d['Round 2']) || 0,
+      fh: parseInt(d['Functional Head']) || 0,
+      hr: parseInt(d['HR Round']) || 0,
+      pb: parseInt(d.Preboarding) || 0,
+    }));
+    initDashboard();
+  } catch(e) {
+    console.error('Failed to load data:', e);
+    document.getElementById('k1').textContent = 'Error';
+  }
+}
 
-const COLS=['#1e3a5f','#2563eb','#3b82f6','#0891b2','#7c3aed','#059669','#d97706','#dc2626','#0f766e','#9333ea'];
-
-function initDashboard(){
-  // TOTALS
-  const tot={
-    roles:DATA.length,
-    hc:DATA.reduce((s,d)=>s+d.hc,0),
-    r1:DATA.reduce((s,d)=>s+d.r1,0),
-    r2:DATA.reduce((s,d)=>s+d.r2,0),
-    fh:DATA.reduce((s,d)=>s+d.fh,0),
-    hr:DATA.reduce((s,d)=>s+d.hr,0),
-    pb:DATA.reduce((s,d)=>s+d.pb,0),
+function initDashboard() {
+  const tot = {
+    roles: DATA.length,
+    hc: DATA.reduce((s,d)=>s+d.hc,0),
+    r1: DATA.reduce((s,d)=>s+d.r1,0),
+    r2: DATA.reduce((s,d)=>s+d.r2,0),
+    fh: DATA.reduce((s,d)=>s+d.fh,0),
+    hr: DATA.reduce((s,d)=>s+d.hr,0),
+    pb: DATA.reduce((s,d)=>s+d.pb,0),
   };
 
-  // KPI
-  document.getElementById('k1').textContent=tot.roles;
-  document.getElementById('k2').textContent=tot.hc;
-  document.getElementById('k3').textContent=tot.r1;
-  document.getElementById('k4').textContent=tot.r2;
-  document.getElementById('k5').textContent=tot.hr;
-  document.getElementById('k6').textContent=tot.pb;
-  document.getElementById('si1').textContent=tot.roles+' roles';
-  document.getElementById('si2').textContent=tot.hc+' openings';
-  document.getElementById('rCount').textContent=tot.roles+' Active Roles';
+  document.getElementById('k1').textContent = tot.roles;
+  document.getElementById('k2').textContent = tot.hc;
+  document.getElementById('k3').textContent = tot.r1;
+  document.getElementById('k4').textContent = tot.r2;
+  document.getElementById('k5').textContent = tot.hr;
+  document.getElementById('k6').textContent = tot.pb;
+  document.getElementById('si1').textContent = tot.roles + ' roles';
+  document.getElementById('si2').textContent = tot.hc + ' openings';
+  document.getElementById('rCount').textContent = tot.roles + ' Active Roles';
 
-  // CLOCK
-  function tick(){
-    const n=new Date();
-    document.getElementById('clock').textContent=n.toTimeString().slice(0,8);
-    document.getElementById('dateln').textContent=n.toLocaleDateString('en-GB',{day:'2-digit',month:'long',year:'numeric'});
-    document.getElementById('si3').textContent=n.toTimeString().slice(0,8);
+  // Clock
+  function tick() {
+    const n = new Date();
+    document.getElementById('clock').textContent = n.toTimeString().slice(0,8);
+    document.getElementById('dateln').textContent = n.toLocaleDateString('en-GB',{day:'2-digit',month:'long',year:'numeric'});
+    document.getElementById('si3').textContent = n.toTimeString().slice(0,8);
   }
-  tick(); setInterval(tick,1000);
+  tick(); setInterval(tick, 1000);
 
-  // DEPT
-  const dm={};
-  DATA.forEach(d=>{dm[d.dept]=(dm[d.dept]||0)+d.hc;});
-  const ds=Object.entries(dm).sort((a,b)=>b[1]-a[1]);
-  new Chart(document.getElementById('deptC'),{
+  // Dept Chart
+  const dm = {};
+  DATA.forEach(d => { dm[d.dept] = (dm[d.dept]||0) + d.hc; });
+  const ds = Object.entries(dm).sort((a,b)=>b[1]-a[1]);
+  if(charts.dept) charts.dept.destroy();
+  charts.dept = new Chart(document.getElementById('deptC'), {
     type:'bar',
     data:{labels:ds.map(d=>d[0]),datasets:[{data:ds.map(d=>d[1]),backgroundColor:COLS,borderRadius:6}]},
     options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{color:'#f1f5f9'},ticks:{font:{size:10}}},y:{grid:{display:false},ticks:{font:{size:10}}}}}
   });
 
-  // LOCATION
-  const lm={};
-  DATA.forEach(d=>{const l=d.loc&&d.loc!='na'?d.loc:'Remote/TBD';lm[l]=(lm[l]||0)+d.hc;});
-  const ls=Object.entries(lm).sort((a,b)=>b[1]-a[1]);
-  new Chart(document.getElementById('locC'),{
+  // Location
+  const lm = {};
+  DATA.forEach(d => { const l = d.loc && d.loc!='na' ? d.loc : 'Remote/TBD'; lm[l] = (lm[l]||0) + d.hc; });
+  const ls = Object.entries(lm).sort((a,b)=>b[1]-a[1]);
+  if(charts.loc) charts.loc.destroy();
+  charts.loc = new Chart(document.getElementById('locC'), {
     type:'doughnut',
     data:{labels:ls.map(l=>l[0]),datasets:[{data:ls.map(l=>l[1]),backgroundColor:COLS,borderWidth:3,borderColor:'#fff'}]},
     options:{responsive:true,maintainAspectRatio:false,cutout:'58%',plugins:{legend:{position:'bottom',labels:{padding:14,font:{size:11}}}}}
   });
-  new Chart(document.getElementById('locP'),{
+  if(charts.locP) charts.locP.destroy();
+  charts.locP = new Chart(document.getElementById('locP'), {
     type:'pie',
     data:{labels:ls.map(l=>l[0]),datasets:[{data:ls.map(l=>l[1]),backgroundColor:COLS,borderWidth:3,borderColor:'#fff'}]},
     options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{padding:14,font:{size:11}}}}}
   });
 
-  // LOC BARS
-  const lb=document.getElementById('locB');
-  ls.forEach((l,i)=>{
-    const p=Math.round((l[1]/tot.hc)*100);
-    lb.innerHTML+=`<div class="lb"><div class="ll">${l[0]}</div><div class="lt"><div class="lbar" style="width:${Math.max(p,5)}%;background:${COLS[i%COLS.length]}"><span>${l[1]}</span></div></div><div class="lp">${p}%</div></div>`;
+  // Loc Bars
+  const lb = document.getElementById('locB');
+  lb.innerHTML = '';
+  ls.forEach((l,i) => {
+    const p = Math.round((l[1]/tot.hc)*100);
+    lb.innerHTML += `<div class="lb"><div class="ll">${l[0]}</div><div class="lt"><div class="lbar" style="width:${Math.max(p,5)}%;background:${COLS[i%COLS.length]}"><span>${l[1]}</span></div></div><div class="lp">${p}%</div></div>`;
   });
 
-  // FUNNEL
-  const stages=[
+  // Funnel
+  const stages = [
     {n:'Total Openings',v:tot.hc,c:'#1e3a5f'},
     {n:'Round 1',v:tot.r1,c:'#2563eb'},
     {n:'Round 2',v:tot.r2,c:'#3b82f6'},
@@ -425,65 +330,53 @@ function initDashboard(){
     {n:'HR Round',v:tot.hr,c:'#7c3aed'},
     {n:'Preboarding',v:tot.pb,c:'#059669'},
   ];
-  function mkFunnel(id){
-    const el=document.getElementById(id);
-    stages.forEach(s=>{
-      const p=tot.hc>0?Math.max((s.v/tot.hc)*100,4):4;
-      el.innerHTML+=`<div class="fr"><div class="fl">${s.n}</div><div class="ft"><div class="fb" style="width:${p}%;background:${s.c}"><span>${s.v>0?s.v:''}</span></div></div><div class="fv">${s.v}</div></div>`;
+  function mkFunnel(id) {
+    const el = document.getElementById(id);
+    el.innerHTML = '';
+    stages.forEach(s => {
+      const p = tot.hc > 0 ? Math.max((s.v/tot.hc)*100, 4) : 4;
+      el.innerHTML += `<div class="fr"><div class="fl">${s.n}</div><div class="ft"><div class="fb" style="width:${p}%;background:${s.c}"><span>${s.v>0?s.v:''}</span></div></div><div class="fv">${s.v}</div></div>`;
     });
   }
   mkFunnel('fov'); mkFunnel('ffl');
-  document.getElementById('fins').innerHTML=`💡 <strong>Insight:</strong> ${tot.r1} of ${tot.hc} openings (${Math.round((tot.r1/tot.hc)*100)}%) have candidates in Round 1. ${tot.pb} candidates are in Preboarding stage — close to offer.`;
+  document.getElementById('fins').innerHTML = `💡 <strong>Insight:</strong> ${tot.r1} of ${tot.hc} openings (${Math.round((tot.r1/tot.hc)*100)}%) have candidates in Round 1. ${tot.pb} candidates are in Preboarding — close to offer.`;
 
-  // RECRUITER
-  const rm={};
-  DATA.forEach(d=>{
-    const r=d.rec||'Unassigned';
-    if(!rm[r])rm[r]={roles:0,hc:0,r1:0,r2:0,hr:0,pb:0};
-    rm[r].roles++;rm[r].hc+=d.hc;rm[r].r1+=d.r1;rm[r].r2+=d.r2;rm[r].hr+=d.hr;rm[r].pb+=d.pb;
+  // Recruiter
+  const rm = {};
+  DATA.forEach(d => {
+    const r = d.rec || 'Unassigned';
+    if(!rm[r]) rm[r] = {roles:0,hc:0,r1:0,r2:0,hr:0,pb:0};
+    rm[r].roles++; rm[r].hc+=d.hc; rm[r].r1+=d.r1; rm[r].r2+=d.r2; rm[r].hr+=d.hr; rm[r].pb+=d.pb;
   });
-  const re=Object.entries(rm).sort((a,b)=>b[1].hc-a[1].hc);
-  new Chart(document.getElementById('recRC'),{
+  const re = Object.entries(rm).sort((a,b)=>b[1].hc-a[1].hc);
+  if(charts.recR) charts.recR.destroy();
+  charts.recR = new Chart(document.getElementById('recRC'), {
     type:'bar',
     data:{labels:re.map(r=>r[0].split(' ')[0]),datasets:[{data:re.map(r=>r[1].roles),backgroundColor:COLS,borderRadius:6}]},
     options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false}},y:{grid:{color:'#f1f5f9'},ticks:{stepSize:1}}}}
   });
-  new Chart(document.getElementById('recHC'),{
+  if(charts.recH) charts.recH.destroy();
+  charts.recH = new Chart(document.getElementById('recHC'), {
     type:'bar',
     data:{labels:re.map(r=>r[0].split(' ')[0]),datasets:[{data:re.map(r=>r[1].hc),backgroundColor:COLS,borderRadius:6}]},
     options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false}},y:{grid:{color:'#f1f5f9'}}}}
   });
-  const rt=document.getElementById('recTb');
-  re.forEach(([n,v])=>{
-    rt.innerHTML+=`<tr>
-      <td><strong style="color:#1e3a5f">${n}</strong></td>
-      <td>${v.roles}</td><td><strong>${v.hc}</strong></td>
-      <td>${v.r1>0?`<span class="pill pb">${v.r1}</span>`:'—'}</td>
-      <td>${v.r2>0?`<span class="pill pp">${v.r2}</span>`:'—'}</td>
-      <td>${v.hr>0?`<span class="pill po">${v.hr}</span>`:'—'}</td>
-      <td>${v.pb>0?`<span class="pill pg">${v.pb}</span>`:'—'}</td>
-    </tr>`;
+  const rt = document.getElementById('recTb');
+  rt.innerHTML = '';
+  re.forEach(([n,v]) => {
+    rt.innerHTML += `<tr><td><strong style="color:#1e3a5f">${n}</strong></td><td>${v.roles}</td><td><strong>${v.hc}</strong></td><td>${v.r1>0?`<span class="pill pb">${v.r1}</span>`:'—'}</td><td>${v.r2>0?`<span class="pill pp">${v.r2}</span>`:'—'}</td><td>${v.hr>0?`<span class="pill po">${v.hr}</span>`:'—'}</td><td>${v.pb>0?`<span class="pill pg">${v.pb}</span>`:'—'}</td></tr>`;
   });
 
-  // ALL ROLES TABLE
-  const tb=document.getElementById('rolesTb');
-  DATA.forEach((d,i)=>{
-    const p=(v,c)=>v>0?`<span class="pill ${c}">${v}</span>`:`<span style="color:#cbd5e1">—</span>`;
-    tb.innerHTML+=`<tr>
-      <td style="color:#94a3b8;font-weight:600">${i+1}</td>
-      <td><strong style="color:#1e3a5f;font-size:12px">${d.role}</strong></td>
-      <td style="color:#475569">${d.dept}</td>
-      <td>${d.loc&&d.loc!='na'?d.loc:'—'}</td>
-      <td>${d.rec||'<span style="color:#94a3b8">Unassigned</span>'}</td>
-      <td><strong>${d.hc}</strong></td>
-      <td>${p(d.r1,'pb')}</td><td>${p(d.r2,'pp')}</td>
-      <td>${p(d.fh,'po')}</td><td>${p(d.hr,'pr')}</td>
-      <td>${p(d.pb,'pg')}</td>
-    </tr>`;
+  // Roles Table
+  const tb = document.getElementById('rolesTb');
+  tb.innerHTML = '';
+  DATA.forEach((d,i) => {
+    const p = (v,c) => v>0 ? `<span class="pill ${c}">${v}</span>` : `<span style="color:#cbd5e1">—</span>`;
+    tb.innerHTML += `<tr><td style="color:#94a3b8;font-weight:600">${i+1}</td><td><strong style="color:#1e3a5f;font-size:12px">${d.role}</strong></td><td style="color:#475569">${d.dept}</td><td>${d.loc&&d.loc!='na'?d.loc:'—'}</td><td>${d.rec||'<span style="color:#94a3b8">Unassigned</span>'}</td><td><strong>${d.hc}</strong></td><td>${p(d.r1,'pb')}</td><td>${p(d.r2,'pp')}</td><td>${p(d.fh,'po')}</td><td>${p(d.hr,'pr')}</td><td>${p(d.pb,'pg')}</td></tr>`;
   });
 }
 
-function sw(name,btn){
+function sw(name, btn) {
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   document.getElementById('panel-'+name).classList.add('active');
