@@ -1,1 +1,1 @@
-[]
+"inputs": "@body('List_rows_present_in_a_table_')?['value']",
