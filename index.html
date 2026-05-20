@@ -9,6 +9,39 @@
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root { --bg-dark: #0f1117; --border: #e5e7eb; --accent-blue: #3b6ef8; }
   body { font-family: 'DM Sans', sans-serif; background: #f3f4f6; color: #111827; min-height: 100vh; }
+  /* PASSWORD GATE */
+  #password-gate {
+    position: fixed; inset: 0; background: var(--bg-dark);
+    display: flex; align-items: center; justify-content: center; z-index: 9999;
+  }
+  .login-box {
+    background: #1a1f2e; border-radius: 20px; padding: 40px 44px;
+    width: 100%; max-width: 400px; box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    text-align: center;
+  }
+  .login-logo { width: 52px; height: 52px; background: var(--accent-blue); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #fff; font-size: 22px; margin: 0 auto 16px; }
+  .login-title { color: #fff; font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+  .login-sub { color: #6b7280; font-size: 13px; margin-bottom: 28px; }
+  .login-input {
+    width: 100%; padding: 12px 16px; border-radius: 10px;
+    border: 1px solid #2d3748; background: #111827;
+    color: #fff; font-size: 14px; font-family: inherit;
+    outline: none; margin-bottom: 14px; letter-spacing: 1px;
+    transition: border-color 0.2s;
+  }
+  .login-input:focus { border-color: var(--accent-blue); }
+  .login-input.error { border-color: #ef4444; animation: shake 0.3s ease; }
+  @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
+  .login-btn {
+    width: 100%; padding: 12px; border-radius: 10px;
+    background: var(--accent-blue); color: #fff; font-size: 14px;
+    font-weight: 600; border: none; cursor: pointer; font-family: inherit;
+    transition: opacity 0.15s, transform 0.15s;
+  }
+  .login-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+  .login-error { color: #ef4444; font-size: 12px; margin-top: 10px; min-height: 18px; }
+  #dashboard-wrap { display: none; }
+
 
   /* HEADER */
   .header { background: var(--bg-dark); padding: 0 28px; display: flex; align-items: center; justify-content: space-between; height: 68px; position: sticky; top: 0; z-index: 100; }
@@ -33,19 +66,14 @@
   .tab:hover { color: #111827; }
   .tab.active { color: var(--accent-blue); border-bottom-color: var(--accent-blue); }
 
-  /* MAIN */
-  .main { padding: 24px 28px; display: flex; flex-direction: column; gap: 24px; }
+  /* PAGES */
+  .page { display: none; padding: 24px 28px; flex-direction: column; gap: 24px; }
+  .page.active { display: flex; }
 
-  /* LOADING STATE */
-  .loading-bar { height: 3px; background: linear-gradient(90deg, var(--accent-blue), #10b981, var(--accent-blue)); background-size: 200%; animation: shimmer 1.5s infinite; border-radius: 2px; margin-bottom: 4px; }
+  /* LOADING */
+  .loading-bar { height: 3px; background: linear-gradient(90deg, var(--accent-blue), #10b981, var(--accent-blue)); background-size: 200%; animation: shimmer 1.5s infinite; border-radius: 2px; }
   @keyframes shimmer { 0%{background-position:0%} 100%{background-position:200%} }
   .loading-text { color: #6b7280; font-size: 13px; text-align: center; padding: 40px; }
-
-  /* SYNC INFO BAR */
-  .sync-bar { background: #fff; border-radius: 10px; padding: 10px 18px; display: flex; align-items: center; gap: 20px; font-size: 12px; color: #6b7280; box-shadow: 0 1px 3px rgba(0,0,0,0.06); flex-wrap: wrap; }
-  .sync-item { display: flex; align-items: center; gap: 6px; }
-  .sync-item strong { color: #111827; }
-  .sync-dot { width: 6px; height: 6px; border-radius: 50%; background: #10b981; }
 
   /* STAT CARDS */
   .stat-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 14px; }
@@ -69,6 +97,13 @@
   .stat-card:nth-child(7) .stat-value { color: #f59e0b; }
   .stat-label { font-size: 10px; font-weight: 600; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.5px; }
 
+  /* SYNC BAR — below stat cards */
+  .sync-bar { background: #fff; border-radius: 10px; padding: 10px 18px; display: flex; align-items: center; gap: 20px; font-size: 12px; color: #6b7280; box-shadow: 0 1px 3px rgba(0,0,0,0.06); flex-wrap: wrap; }
+  .sync-item { display: flex; align-items: center; gap: 6px; }
+  .sync-item strong { color: #111827; }
+  .sync-dot { width: 6px; height: 6px; border-radius: 50%; background: #10b981; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
   /* TWO-COL LAYOUT */
   .content-row { display: grid; grid-template-columns: 360px 1fr; gap: 20px; align-items: start; }
 
@@ -77,7 +112,6 @@
   .chart-panel-header { padding: 16px 20px 12px; border-bottom: 1px solid #f3f4f6; }
   .chart-panel-title { font-size: 13.5px; font-weight: 600; color: #111827; display: flex; align-items: center; gap: 8px; }
   .chart-body { padding: 12px 14px 14px; display: flex; flex-direction: column; gap: 3px; }
-
   .dept-row { border-radius: 8px; overflow: hidden; }
   .dept-bar-line { display: flex; align-items: center; gap: 8px; padding: 6px 8px; cursor: pointer; border-radius: 8px; transition: background 0.12s; }
   .dept-bar-line:hover { background: #f9fafb; }
@@ -87,8 +121,6 @@
   .bar-count { font-size: 11px; font-weight: 600; color: #6b7280; width: 18px; text-align: right; flex-shrink: 0; }
   .dept-chevron { font-size: 8px; color: #9ca3af; transition: transform 0.2s; flex-shrink: 0; }
   .dept-bar-line.open .dept-chevron { transform: rotate(180deg); }
-
-  /* DEPT DROPDOWN */
   .dept-dropdown { overflow: hidden; max-height: 0; transition: max-height 0.3s ease; background: #fafafa; }
   .dept-dropdown.open { max-height: 800px; }
   .dept-dropdown-inner { padding: 8px 10px 10px 176px; display: flex; flex-direction: column; gap: 4px; }
@@ -104,23 +136,38 @@
   .table-title { display: flex; align-items: center; gap: 9px; color: #fff; font-size: 14px; font-weight: 600; }
   .active-badge { color: var(--accent-blue); font-size: 13px; font-weight: 600; }
   .table-wrap { overflow-x: auto; }
-
   table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
   thead tr { background: rgba(255,255,255,0.04); border-bottom: 1px solid rgba(255,255,255,0.08); }
   th { padding: 10px 11px; text-align: left; font-size: 10.5px; font-weight: 600; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.4px; white-space: nowrap; }
   th.num { text-align: center; }
-
   tr.main-row { border-bottom: 1px solid rgba(255,255,255,0.05); transition: background 0.12s; }
   tr.main-row:hover { background: rgba(255,255,255,0.03); }
-
   td { padding: 11px 11px; color: #e5e7eb; vertical-align: middle; }
   td.row-num { color: #4b5563; font-size: 11px; font-weight: 500; text-align: center; }
   td.role-name { font-weight: 600; color: #f9fafb; max-width: 200px; font-size: 12.5px; }
-  td.dept { color: #9ca3af; font-size: 11.5px; }
   td.location { color: #d1d5db; white-space: nowrap; font-size: 11.5px; }
   .recruiter-name { color: #d1d5db; font-size: 11.5px; }
   .recruiter-unassigned { color: #ef4444; font-style: italic; font-size: 11.5px; }
   td.num-cell { text-align: center; }
+
+  /* DEPT CELL WITH DROPDOWN IN TABLE */
+  .dept-cell-btn { background: none; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; padding: 0; color: #9ca3af; font-size: 11.5px; font-family: inherit; transition: color 0.15s; }
+  .dept-cell-btn:hover { color: #d1d5db; }
+  .dept-cell-chevron { font-size: 7px; transition: transform 0.2s; }
+  .dept-cell-btn.open .dept-cell-chevron { transform: rotate(180deg); }
+
+  /* TABLE DROPDOWN ROW */
+  tr.dropdown-row { background: rgba(255,255,255,0.02); }
+  tr.dropdown-row td { padding: 0; }
+  .dropdown-inner { overflow: hidden; max-height: 0; transition: max-height 0.3s ease; }
+  .dropdown-inner.open { max-height: 500px; }
+  .dropdown-content { padding: 12px 14px 14px 46px; display: flex; gap: 20px; flex-wrap: wrap; }
+  .drop-section { min-width: 200px; }
+  .drop-section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 8px; }
+  .label-dept { color: #93c5fd; }
+  .label-hr   { color: #a78bfa; }
+  .label-pre  { color: #6ee7b7; }
+  .label-hire { color: #fcd34d; }
 
   /* PILLS */
   .pill { display: inline-flex; align-items: center; justify-content: center; min-width: 24px; height: 20px; padding: 0 7px; border-radius: 999px; font-size: 11.5px; font-weight: 600; font-family: 'DM Mono', monospace; }
@@ -132,44 +179,71 @@
   .pill-pre  { background: rgba(16,185,129,0.3);   color: #6ee7b7; }
   .pill-hire { background: rgba(245,158,11,0.3);   color: #fcd34d; }
   .dash { color: #374151; }
-
-  /* CLICKABLE PILL BUTTONS */
   .pill-btn { cursor: pointer; border: none; background: none; padding: 0; display: inline-flex; align-items: center; gap: 4px; transition: opacity 0.15s; }
   .pill-btn:hover { opacity: 0.75; }
   .chevron { font-size: 7px; color: #6b7280; transition: transform 0.2s; display: inline-block; line-height: 1; }
   .pill-btn.open .chevron { transform: rotate(180deg); }
-
-  /* TABLE DROPDOWN ROW */
-  tr.dropdown-row { background: rgba(255,255,255,0.02); }
-  tr.dropdown-row td { padding: 0; }
-  .dropdown-inner { overflow: hidden; max-height: 0; transition: max-height 0.3s ease; }
-  .dropdown-inner.open { max-height: 400px; }
-  .dropdown-content { padding: 12px 14px 14px 46px; display: flex; gap: 20px; flex-wrap: wrap; }
-
-  .drop-section { min-width: 180px; }
-  .drop-section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 8px; }
-  .label-hr   { color: #a78bfa; }
-  .label-pre  { color: #6ee7b7; }
-  .label-hire { color: #fcd34d; }
-
-  .candidate-list { display: flex; flex-direction: column; gap: 5px; }
-  .candidate-chip { display: flex; align-items: center; gap: 8px; padding: 5px 10px; border-radius: 7px; }
-  .chip-hr   { background: rgba(139,92,246,0.1);  border: 1px solid rgba(139,92,246,0.2); }
-  .chip-pre  { background: rgba(16,185,129,0.1);  border: 1px solid rgba(16,185,129,0.2); }
-  .chip-hire { background: rgba(245,158,11,0.1);  border: 1px solid rgba(245,158,11,0.2); }
-
-  .chip-avatar { width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 8px; font-weight: 700; color: #fff; flex-shrink: 0; }
-  .av-hr   { background: #7c3aed; }
-  .av-pre  { background: #059669; }
-  .av-hire { background: #d97706; }
-  .chip-name  { color: #f3f4f6; font-size: 12px; font-weight: 500; }
-  .chip-stage { font-size: 10px; color: #6b7280; }
-
-  /* NO CANDIDATES NOTE */
   .no-candidates { color: #4b5563; font-size: 11px; font-style: italic; padding: 4px 0; }
+
+  /* ── OVERVIEW PAGE ── */
+  .overview-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .panel { background: #fff; border-radius: 16px; padding: 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); }
+  .panel-title { font-size: 13.5px; font-weight: 600; color: #111827; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+  .funnel-bar { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+  .funnel-label { font-size: 12px; color: #374151; width: 100px; flex-shrink: 0; }
+  .funnel-track { flex: 1; background: #f3f4f6; border-radius: 4px; height: 20px; overflow: hidden; }
+  .funnel-fill { height: 100%; border-radius: 4px; display: flex; align-items: center; padding-left: 8px; font-size: 11px; font-weight: 600; color: #fff; transition: width 0.7s ease; }
+  .funnel-pct { font-size: 11px; color: #6b7280; width: 36px; text-align: right; flex-shrink: 0; }
+
+  /* ── RECRUITER PAGE ── */
+  .recruiter-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .recruiter-card { background: #fff; border-radius: 14px; padding: 18px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); }
+  .recruiter-name-head { font-size: 13px; font-weight: 600; color: #111827; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+  .recruiter-avatar { width: 28px; height: 28px; border-radius: 50%; background: var(--accent-blue); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: #fff; flex-shrink: 0; }
+  .recruiter-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .r-stat { background: #f9fafb; border-radius: 8px; padding: 8px 10px; }
+  .r-stat-val { font-size: 18px; font-weight: 700; color: var(--accent-blue); }
+  .r-stat-lbl { font-size: 10px; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.4px; margin-top: 2px; }
+  .recruiter-roles { margin-top: 12px; }
+  .recruiter-role-item { font-size: 11px; color: #6b7280; padding: 4px 0; border-bottom: 1px solid #f3f4f6; }
+  .recruiter-role-item:last-child { border-bottom: none; }
+
+  /* ── LOCATION PAGE ── */
+  .location-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .loc-bar-row { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+  .loc-label { font-size: 12px; color: #374151; width: 120px; flex-shrink: 0; }
+  .loc-track { flex: 1; background: #f3f4f6; border-radius: 4px; height: 22px; overflow: hidden; }
+  .loc-fill { height: 100%; border-radius: 4px; display: flex; align-items: center; padding-left: 10px; font-size: 11px; font-weight: 600; color: #fff; transition: width 0.7s ease; }
+  .loc-pct { font-size: 11px; color: #6b7280; width: 36px; text-align: right; }
+  .loc-roles-list { margin-top: 16px; }
+  .loc-role-item { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #f3f4f6; font-size: 12px; }
+  .loc-role-item:last-child { border-bottom: none; }
+
+  /* HIRING FUNNEL PAGE */
+  .funnel-page-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .stage-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-radius: 10px; margin-bottom: 8px; }
+  .stage-name { font-size: 13px; font-weight: 500; }
+  .stage-count { font-size: 20px; font-weight: 700; }
+  .stage-bar-wrap { flex: 1; margin: 0 16px; background: #f3f4f6; border-radius: 4px; height: 8px; overflow: hidden; }
+  .stage-bar-fill { height: 100%; border-radius: 4px; transition: width 0.7s ease; }
 </style>
 </head>
 <body>
+<!-- PASSWORD GATE -->
+<div id="password-gate">
+  <div class="login-box">
+    <div class="login-logo">S</div>
+    <div class="login-title">Skan AI — Hiring Dashboard</div>
+    <div class="login-sub">Enter your password to access</div>
+    <input class="login-input" type="password" id="pwInput" placeholder="Password" onkeydown="if(event.key==='Enter')checkPw()" />
+    <button class="login-btn" onclick="checkPw()">Access Dashboard</button>
+    <div class="login-error" id="pwError"></div>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboard-wrap">
+
 
 <header class="header">
   <div class="header-left">
@@ -190,69 +264,91 @@
 </header>
 
 <nav class="nav-bar">
-  <div class="tab">📊 Overview</div>
-  <div class="tab">🎯 Hiring Funnel</div>
-  <div class="tab">👤 Recruiter Workload</div>
-  <div class="tab">📍 Location Breakdown</div>
-  <div class="tab active">📋 All Roles</div>
+  <div class="tab active" onclick="switchTab('overview',this)">📊 Overview</div>
+  <div class="tab" onclick="switchTab('funnel',this)">🎯 Hiring Funnel</div>
+  <div class="tab" onclick="switchTab('recruiter',this)">👤 Recruiter Workload</div>
+  <div class="tab" onclick="switchTab('location',this)">📍 Location Breakdown</div>
+  <div class="tab" onclick="switchTab('allroles',this)">📋 All Roles</div>
 </nav>
 
-<main class="main" id="mainContent">
+<!-- OVERVIEW -->
+<div class="page active" id="page-overview">
   <div class="loading-bar"></div>
   <div class="loading-text">⏳ Fetching live data from Keka ATS...</div>
-</main>
+</div>
+
+<!-- HIRING FUNNEL -->
+<div class="page" id="page-funnel"></div>
+
+<!-- RECRUITER WORKLOAD -->
+<div class="page" id="page-recruiter"></div>
+
+<!-- LOCATION BREAKDOWN -->
+<div class="page" id="page-location"></div>
+
+<!-- ALL ROLES -->
+<div class="page" id="page-allroles"></div>
 
 <script>
-  // ── CLOCK ─────────────────────────────────────────────────────────────────
+  // ── CLOCK ──────────────────────────────────────────────────────────────
   function updateClock() {
     const now = new Date();
     document.getElementById('clock').textContent = now.toTimeString().slice(0,8);
     document.getElementById('clockDate').textContent = now.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
   }
-  setInterval(updateClock, 1000);
-  updateClock();
+  setInterval(updateClock, 1000); updateClock();
 
-  // ── CONSTANTS ─────────────────────────────────────────────────────────────
+  // ── TAB SWITCHING ──────────────────────────────────────────────────────
+  function switchTab(name, el) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('page-' + name).classList.add('active');
+  }
+
+  // ── CONSTANTS ──────────────────────────────────────────────────────────
   const DATA_URL = 'https://raw.githubusercontent.com/ArpitSkan/skan-hiring-dashboard/main/data.json';
   const BAR_COLORS = ['#1e3a5f','#2563eb','#3b82f6','#0d9488','#7c3aed','#16a34a','#d97706','#dc2626','#0f766e','#9333ea','#374151','#b45309'];
 
-  // ── FETCH DATA ────────────────────────────────────────────────────────────
+  let ROLES = [];
+
+  // ── FETCH ──────────────────────────────────────────────────────────────
   async function loadDashboard() {
     try {
-      const res = await fetch(DATA_URL + '?_=' + Date.now()); // cache-bust
+      const res = await fetch(DATA_URL + '?_=' + Date.now());
       if (!res.ok) throw new Error('HTTP ' + res.status);
       const raw = await res.json();
-      renderAll(raw);
-    } catch (err) {
-      document.getElementById('mainContent').innerHTML =
+      ROLES = normalise(raw);
+      renderAll();
+    } catch(err) {
+      document.getElementById('page-overview').innerHTML =
         `<div class="loading-text" style="color:#ef4444">⚠️ Could not load live data.<br><small>${err.message}</small></div>`;
     }
   }
 
-  // ── MAP RAW JSON → NORMALISED ROLES ──────────────────────────────────────
   function normalise(raw) {
-    return raw.map((r, i) => ({
-      id:        i + 1,
-      name:      r['RoleName'] || '—',
-      dept:      r['Department'] || '—',
-      location:  r['Location'] && r['Location'] !== 'na' ? r['Location'] : '—',
-      recruiter: r['Recruiter'] || null,
-      hc:        parseInt(r['TotalHC'])        || 0,
-      r1:        parseInt(r['Round 1'])        || 0,
-      r2:        parseInt(r['Round 2'])        || 0,
-      fh:        parseInt(r['Functional Head'])|| 0,
-      hr:        parseInt(r['HR Round'])       || 0,
-      pre:       parseInt(r['Preboarding'])    || 0,
-      hired:     parseInt(r['Hired'])          || 0,   // will be 0 until field added in Keka
-      lastSync:  r['Last updated'] || null,
+    return raw.map((r,i) => ({
+      id:       i+1,
+      name:     r['RoleName'] || '—',
+      dept:     r['Department'] || '—',
+      location: r['Location'] && r['Location'] !== 'na' ? r['Location'] : 'Remote/TBD',
+      recruiter:r['Recruiter'] || null,
+      hc:       parseInt(r['TotalHC'])         || 0,
+      r1:       parseInt(r['Round 1'])         || 0,
+      r2:       parseInt(r['Round 2'])         || 0,
+      fh:       parseInt(r['Functional Head']) || 0,
+      hr:       parseInt(r['HR Round'])        || 0,
+      pre:      parseInt(r['Preboarding'])     || 0,
+      hired:    parseInt(r['Hired'])           || 0,
+      lastSync: r['Last updated'] || null,
     }));
   }
 
-  // ── RENDER EVERYTHING ─────────────────────────────────────────────────────
-  function renderAll(raw) {
-    const roles = normalise(raw);
+  function initials(n) { return (n||'?').split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase(); }
 
-    // Totals
+  // ── RENDER ALL PAGES ───────────────────────────────────────────────────
+  function renderAll() {
+    const roles = ROLES;
     const totalRoles = roles.length;
     const totalHC    = roles.reduce((s,r)=>s+r.hc,   0);
     const totalR1    = roles.reduce((s,r)=>s+r.r1,   0);
@@ -260,43 +356,35 @@
     const totalHR    = roles.reduce((s,r)=>s+r.hr,   0);
     const totalPre   = roles.reduce((s,r)=>s+r.pre,  0);
     const totalHired = roles.reduce((s,r)=>s+r.hired,0);
-
-    // Last sync time
-    const lastSync = roles.map(r=>r.lastSync).filter(Boolean).sort().pop();
-    const lastSyncStr = lastSync ? new Date(lastSync).toLocaleTimeString('en-GB') : '—';
+    const lastSync   = roles.map(r=>r.lastSync).filter(Boolean).sort().pop();
+    const lastSyncStr= lastSync ? new Date(lastSync).toLocaleTimeString('en-GB') : '—';
 
     // Dept map
     const deptMap = {};
-    roles.forEach(r => {
-      if (!deptMap[r.dept]) deptMap[r.dept] = [];
-      deptMap[r.dept].push(r);
-    });
+    roles.forEach(r => { if(!deptMap[r.dept]) deptMap[r.dept]=[]; deptMap[r.dept].push(r); });
     const depts = Object.entries(deptMap)
-      .map(([name, list]) => ({
-        name,
-        count:  list.reduce((s,r)=>s+r.hc,    0),
-        hired:  list.reduce((s,r)=>s+r.hired,  0),
-        roles:  list
-      }))
-      .sort((a,b) => b.count - a.count);
+      .map(([name,list])=>({ name, count:list.reduce((s,r)=>s+r.hc,0), hired:list.reduce((s,r)=>s+r.hired,0), roles:list }))
+      .sort((a,b)=>b.count-a.count);
+    const maxDeptCount = depts[0]?.count || 1;
 
-    const maxCount = depts[0]?.count || 1;
+    // Location map
+    const locMap = {};
+    roles.forEach(r => { const l=r.location||'Remote/TBD'; if(!locMap[l]) locMap[l]={hc:0,roles:[]}; locMap[l].hc+=r.hc; locMap[l].roles.push(r); });
+    const locs = Object.entries(locMap).map(([name,d])=>({name,...d})).sort((a,b)=>b.hc-a.hc);
+    const maxLocHC = locs[0]?.hc || 1;
 
-    // ── BUILD HTML ──────────────────────────────────────────────────────────
-    document.getElementById('mainContent').innerHTML = `
+    // Recruiter map
+    const recMap = {};
+    roles.forEach(r => {
+      const rec = r.recruiter || 'Unassigned';
+      if(!recMap[rec]) recMap[rec]={hc:0,r1:0,r2:0,hr:0,pre:0,hired:0,roles:[]};
+      recMap[rec].hc+=r.hc; recMap[rec].r1+=r.r1; recMap[rec].r2+=r.r2;
+      recMap[rec].hr+=r.hr; recMap[rec].pre+=r.pre; recMap[rec].hired+=r.hired;
+      recMap[rec].roles.push(r);
+    });
+    const recruiters = Object.entries(recMap).map(([name,d])=>({name,...d})).sort((a,b)=>b.hc-a.hc);
 
-      <!-- SYNC BAR -->
-      <div class="sync-bar">
-        <div class="sync-item"><span class="sync-dot"></span><span>Data Source: <strong>Keka ATS</strong></span></div>
-        <div class="sync-item">Sync Frequency: <strong>Every 1 Hour</strong></div>
-        <div class="sync-item">Total Roles: <strong>${totalRoles} roles</strong></div>
-        <div class="sync-item">Total Headcount: <strong>${totalHC} openings</strong></div>
-        <div class="sync-item">Last Sync: <strong>${lastSyncStr}</strong></div>
-        <div class="sync-item">Connection: <strong style="color:#10b981">✅ Active</strong></div>
-        <div class="sync-item">Platform: <strong>Power Automate → GitHub → Netlify</strong></div>
-      </div>
-
-      <!-- STAT CARDS -->
+    const statCards = `
       <div class="stat-grid">
         <div class="stat-card"><span class="stat-icon">💼</span><div class="stat-value">${totalRoles}</div><div class="stat-label">Total Roles</div></div>
         <div class="stat-card"><span class="stat-icon">👥</span><div class="stat-value">${totalHC}</div><div class="stat-label">Total Headcount</div></div>
@@ -305,26 +393,137 @@
         <div class="stat-card"><span class="stat-icon">🤝</span><div class="stat-value">${totalHR}</div><div class="stat-label">HR Round</div></div>
         <div class="stat-card"><span class="stat-icon">📋</span><div class="stat-value">${totalPre}</div><div class="stat-label">Preboarding</div></div>
         <div class="stat-card"><span class="stat-icon">✅</span><div class="stat-value">${totalHired}</div><div class="stat-label">Hired</div></div>
-      </div>
+      </div>`;
 
-      <!-- CHART + TABLE -->
-      <div class="content-row">
+    const syncBar = `
+      <div class="sync-bar">
+        <div class="sync-item"><span class="sync-dot"></span><span>Data Source: <strong>Keka ATS</strong></span></div>
+        <div class="sync-item">Sync: <strong>Every 1 Hour</strong></div>
+        <div class="sync-item">Roles: <strong>${totalRoles}</strong></div>
+        <div class="sync-item">Headcount: <strong>${totalHC}</strong></div>
+        <div class="sync-item">Last Sync: <strong>${lastSyncStr}</strong></div>
+        <div class="sync-item">Connection: <strong style="color:#10b981">✅ Active</strong></div>
+        <div class="sync-item">Platform: <strong>Power Automate → GitHub → Netlify</strong></div>
+      </div>`;
 
-        <!-- DEPT CHART -->
-        <div class="chart-panel">
-          <div class="chart-panel-header">
-            <div class="chart-panel-title">🏢 Open Roles by Department</div>
+    // ── OVERVIEW PAGE ────────────────────────────────────────────────────
+    const maxStage = Math.max(totalR1,totalR2,totalHR,totalPre,1);
+    document.getElementById('page-overview').innerHTML = statCards + syncBar + `
+      <div class="overview-grid">
+        <div class="panel">
+          <div class="panel-title">🎯 Pipeline Summary</div>
+          ${[
+            {label:'Round 1',val:totalR1,color:'#3b82f6'},
+            {label:'Round 2',val:totalR2,color:'#a855f7'},
+            {label:'HR Round',val:totalHR,color:'#8b5cf6'},
+            {label:'Preboarding',val:totalPre,color:'#10b981'},
+            {label:'Hired',val:totalHired,color:'#f59e0b'},
+          ].map(s=>`
+            <div class="funnel-bar">
+              <div class="funnel-label">${s.label}</div>
+              <div class="funnel-track"><div class="funnel-fill" style="width:${(s.val/maxStage*100).toFixed(1)}%;background:${s.color}">${s.val}</div></div>
+              <div class="funnel-pct">${totalHC ? (s.val/totalHC*100).toFixed(0)+'%' : '—'}</div>
+            </div>`).join('')}
+        </div>
+        <div class="panel">
+          <div class="panel-title">🏢 Open Roles by Department</div>
+          ${depts.slice(0,8).map((d,i)=>`
+            <div class="funnel-bar">
+              <div class="funnel-label" style="font-size:11px;width:140px" title="${d.name}">${d.name.length>18?d.name.slice(0,18)+'…':d.name}</div>
+              <div class="funnel-track"><div class="funnel-fill" style="width:${(d.count/maxDeptCount*100).toFixed(1)}%;background:${BAR_COLORS[i]}">${d.count}</div></div>
+              <div class="funnel-pct">${(d.count/totalHC*100).toFixed(0)}%</div>
+            </div>`).join('')}
+        </div>
+      </div>`;
+    animateBars('#page-overview');
+
+    // ── HIRING FUNNEL PAGE ────────────────────────────────────────────────
+    const maxF = Math.max(totalR1,totalR2,totalHR,totalPre,totalHired,1);
+    document.getElementById('page-funnel').innerHTML = statCards + `
+      <div class="panel" style="max-width:700px">
+        <div class="panel-title">🎯 Hiring Funnel — End to End</div>
+        ${[
+          {label:'Round 1',    val:totalR1,    color:'#3b82f6', icon:'1️⃣'},
+          {label:'Round 2',    val:totalR2,    color:'#a855f7', icon:'2️⃣'},
+          {label:'Functional', val:roles.reduce((s,r)=>s+r.fh,0), color:'#f59e0b', icon:'🏅'},
+          {label:'HR Round',   val:totalHR,    color:'#8b5cf6', icon:'🤝'},
+          {label:'Preboarding',val:totalPre,   color:'#10b981', icon:'📋'},
+          {label:'Hired',      val:totalHired, color:'#f59e0b', icon:'✅'},
+        ].map(s=>`
+          <div class="stage-row" style="background:${s.color}18">
+            <div class="stage-name">${s.icon} ${s.label}</div>
+            <div class="stage-bar-wrap"><div class="stage-bar-fill" style="width:${(s.val/maxF*100).toFixed(1)}%;background:${s.color}"></div></div>
+            <div class="stage-count" style="color:${s.color}">${s.val}</div>
+          </div>`).join('')}
+      </div>`;
+    animateBars('#page-funnel');
+
+    // ── RECRUITER WORKLOAD PAGE ───────────────────────────────────────────
+    document.getElementById('page-recruiter').innerHTML = statCards + `
+      <div class="recruiter-grid">
+        ${recruiters.map(rec=>`
+          <div class="recruiter-card">
+            <div class="recruiter-name-head">
+              <div class="recruiter-avatar">${initials(rec.name)}</div>
+              ${rec.name}
+            </div>
+            <div class="recruiter-stats">
+              <div class="r-stat"><div class="r-stat-val">${rec.hc}</div><div class="r-stat-lbl">Headcount</div></div>
+              <div class="r-stat"><div class="r-stat-val" style="color:#3b82f6">${rec.r1}</div><div class="r-stat-lbl">Round 1</div></div>
+              <div class="r-stat"><div class="r-stat-val" style="color:#8b5cf6">${rec.hr}</div><div class="r-stat-lbl">HR Round</div></div>
+              <div class="r-stat"><div class="r-stat-val" style="color:#10b981">${rec.pre}</div><div class="r-stat-lbl">Preboarding</div></div>
+            </div>
+            <div class="recruiter-roles">
+              ${rec.roles.slice(0,4).map(r=>`<div class="recruiter-role-item">• ${r.name}</div>`).join('')}
+              ${rec.roles.length>4?`<div class="recruiter-role-item" style="color:#3b6ef8">+${rec.roles.length-4} more roles</div>`:''}
+            </div>
+          </div>`).join('')}
+      </div>`;
+
+    // ── LOCATION BREAKDOWN PAGE ───────────────────────────────────────────
+    document.getElementById('page-location').innerHTML = statCards + `
+      <div class="location-grid">
+        <div class="panel">
+          <div class="panel-title">📍 Headcount by Location</div>
+          ${locs.map((l,i)=>`
+            <div class="loc-bar-row">
+              <div class="loc-label">${l.name}</div>
+              <div class="loc-track"><div class="loc-fill" style="width:${(l.hc/maxLocHC*100).toFixed(1)}%;background:${BAR_COLORS[i]}">${l.hc}</div></div>
+              <div class="loc-pct">${(l.hc/totalHC*100).toFixed(0)}%</div>
+            </div>`).join('')}
+        </div>
+        <div class="panel">
+          <div class="panel-title">📋 Roles by Location</div>
+          <div class="loc-roles-list">
+            ${locs.map(l=>`
+              <div style="margin-bottom:14px">
+                <div style="font-size:12px;font-weight:600;color:#374151;margin-bottom:6px">📍 ${l.name} — ${l.hc} HC</div>
+                ${l.roles.map(r=>`
+                  <div class="loc-role-item">
+                    <span style="color:#374151">${r.name}</span>
+                    <span style="color:#9ca3af">HC: ${r.hc}</span>
+                  </div>`).join('')}
+              </div>`).join('')}
           </div>
+        </div>
+      </div>`;
+    animateBars('#page-location');
+
+    // ── ALL ROLES PAGE ────────────────────────────────────────────────────
+    document.getElementById('page-allroles').innerHTML = statCards + `
+      <div class="content-row">
+        <div class="chart-panel">
+          <div class="chart-panel-header"><div class="chart-panel-title">🏢 Open Roles by Department</div></div>
           <div class="chart-body">
-            ${depts.map((d,i) => {
-              const pct = (d.count / maxCount * 100).toFixed(1);
-              const color = BAR_COLORS[i % BAR_COLORS.length];
-              const roleChips = d.roles.map(r => `
+            ${depts.map((d,i)=>{
+              const pct=(d.count/maxDeptCount*100).toFixed(1);
+              const color=BAR_COLORS[i%BAR_COLORS.length];
+              const roleChips=d.roles.map(r=>`
                 <div class="dept-role-chip">
                   <span>${r.name}</span>
                   <div class="chip-stats">
                     <span class="chip-stat chip-stat-hc">HC: ${r.hc}</span>
-                    ${r.hired ? `<span class="chip-stat chip-stat-hire">✅ ${r.hired} Hired</span>` : ''}
+                    ${r.hired?`<span class="chip-stat chip-stat-hire">✅ ${r.hired}</span>`:''}
                   </div>
                 </div>`).join('');
               return `
@@ -335,15 +534,12 @@
                     <span class="bar-count">${d.count}</span>
                     <span class="dept-chevron">▼</span>
                   </div>
-                  <div class="dept-dropdown">
-                    <div class="dept-dropdown-inner">${roleChips}</div>
-                  </div>
+                  <div class="dept-dropdown"><div class="dept-dropdown-inner">${roleChips}</div></div>
                 </div>`;
             }).join('')}
           </div>
         </div>
 
-        <!-- TABLE -->
         <div class="table-section">
           <div class="table-header">
             <div class="table-title">📋 All Active Roles</div>
@@ -369,18 +565,23 @@
               </thead>
               <tbody>
                 ${roles.map(r => {
-                  const hasHR  = r.hr  > 0;
-                  const hasPre = r.pre > 0;
-                  const hasHire= r.hired > 0;
+                  const hasHR   = r.hr   > 0;
+                  const hasPre  = r.pre  > 0;
+                  const hasHire = r.hired> 0;
                   const hasDrop = hasHR || hasPre || hasHire;
 
-                  const hrBtn   = hasHR   ? `<button class="pill-btn" onclick="toggleRow(this)"><span class="pill pill-hr">${r.hr}</span><span class="chevron">▼</span></button>` : `<span class="dash">—</span>`;
-                  const preBtn  = hasPre  ? `<button class="pill-btn" onclick="toggleRow(this)"><span class="pill pill-pre">${r.pre}</span><span class="chevron">▼</span></button>` : `<span class="dash">—</span>`;
-                  const hireBtn = hasHire ? `<button class="pill-btn" onclick="toggleRow(this)"><span class="pill pill-hire">${r.hired}</span><span class="chevron">▼</span></button>` : `<span class="dash">—</span>`;
+                  const hrBtn   = hasHR   ? `<button class="pill-btn" onclick="toggleRow(this)"><span class="pill pill-hr">${r.hr}</span><span class="chevron">▼</span></button>`   : `<span class="dash">—</span>`;
+                  const preBtn  = hasPre  ? `<button class="pill-btn" onclick="toggleRow(this)"><span class="pill pill-pre">${r.pre}</span><span class="chevron">▼</span></button>`  : `<span class="dash">—</span>`;
+                  const hireBtn = hasHire ? `<button class="pill-btn" onclick="toggleRow(this)"><span class="pill pill-hire">${r.hired}</span><span class="chevron">▼</span></button>`: `<span class="dash">—</span>`;
 
-                  // Dropdown content — candidate names not in data.json yet,
-                  // so we show counts with a note until Hired field is added
-                  let dropSections = '';
+                  // Dept roles list for dropdown
+                  const deptRoles = ROLES.filter(x=>x.dept===r.dept && x.id!==r.id);
+
+                  let dropSections = `<div class="drop-section"><div class="drop-section-label label-dept">🏢 ${r.dept}</div>${
+                    deptRoles.length
+                      ? deptRoles.map(x=>`<div class="no-candidates" style="color:#9ca3af">• ${x.name} (HC: ${x.hc})</div>`).join('')
+                      : '<div class="no-candidates">Only role in this department</div>'
+                  }</div>`;
                   if (hasHR)   dropSections += `<div class="drop-section"><div class="drop-section-label label-hr">🤝 HR Round — ${r.hr} candidate${r.hr>1?'s':''}</div><div class="no-candidates">Candidate names sync when added to Keka</div></div>`;
                   if (hasPre)  dropSections += `<div class="drop-section"><div class="drop-section-label label-pre">📋 Preboarding — ${r.pre} candidate${r.pre>1?'s':''}</div><div class="no-candidates">Candidate names sync when added to Keka</div></div>`;
                   if (hasHire) dropSections += `<div class="drop-section"><div class="drop-section-label label-hire">✅ Hired — ${r.hired} candidate${r.hired>1?'s':''}</div><div class="no-candidates">Candidate names sync when added to Keka</div></div>`;
@@ -389,70 +590,101 @@
                     <tr class="main-row">
                       <td class="row-num">${r.id}</td>
                       <td class="role-name">${r.name}</td>
-                      <td class="dept">${r.dept}</td>
+                      <td>
+                        <button class="dept-cell-btn" onclick="toggleRow(this)">
+                          <span style="color:#9ca3af;font-size:11.5px">${r.dept}</span>
+                          <span class="dept-cell-chevron">▼</span>
+                        </button>
+                      </td>
                       <td class="location">${r.location}</td>
-                      <td>${r.recruiter ? `<span class="recruiter-name">${r.recruiter}</span>` : `<span class="recruiter-unassigned">Unassigned</span>`}</td>
+                      <td>${r.recruiter?`<span class="recruiter-name">${r.recruiter}</span>`:`<span class="recruiter-unassigned">Unassigned</span>`}</td>
                       <td class="num-cell"><span class="pill pill-hc">${r.hc}</span></td>
-                      <td class="num-cell">${r.r1  ? `<span class="pill pill-r1">${r.r1}</span>`  : `<span class="dash">—</span>`}</td>
-                      <td class="num-cell">${r.r2  ? `<span class="pill pill-r2">${r.r2}</span>`  : `<span class="dash">—</span>`}</td>
-                      <td class="num-cell">${r.fh  ? `<span class="pill pill-fh">${r.fh}</span>`  : `<span class="dash">—</span>`}</td>
+                      <td class="num-cell">${r.r1?`<span class="pill pill-r1">${r.r1}</span>`:`<span class="dash">—</span>`}</td>
+                      <td class="num-cell">${r.r2?`<span class="pill pill-r2">${r.r2}</span>`:`<span class="dash">—</span>`}</td>
+                      <td class="num-cell">${r.fh?`<span class="pill pill-fh">${r.fh}</span>`:`<span class="dash">—</span>`}</td>
                       <td class="num-cell">${hrBtn}</td>
                       <td class="num-cell">${preBtn}</td>
                       <td class="num-cell">${hireBtn}</td>
                     </tr>
-                    ${hasDrop ? `
                     <tr class="dropdown-row">
                       <td colspan="12">
                         <div class="dropdown-inner">
                           <div class="dropdown-content">${dropSections}</div>
                         </div>
                       </td>
-                    </tr>` : ''}`;
+                    </tr>`;
                 }).join('')}
               </tbody>
             </table>
           </div>
         </div>
       </div>`;
+    animateBars('#page-allroles');
+  }
 
-    // Animate bars
+  // ── ANIMATE BARS ───────────────────────────────────────────────────────
+  function animateBars(scope) {
     requestAnimationFrame(() => {
-      document.querySelectorAll('.bar-fill').forEach(el => {
-        el.style.width = el.dataset.pct + '%';
+      document.querySelectorAll(`${scope} .bar-fill, ${scope} .funnel-fill, ${scope} .stage-bar-fill, ${scope} .loc-fill`).forEach(el => {
+        if (el.dataset.pct) el.style.width = el.dataset.pct + '%';
       });
     });
   }
 
-  // ── DEPT CHART TOGGLE ────────────────────────────────────────────────────
+  // ── DEPT CHART TOGGLE ──────────────────────────────────────────────────
   function toggleDept(btn) {
     const drop = btn.nextElementSibling;
     const isOpen = drop.classList.contains('open');
-    document.querySelectorAll('.dept-dropdown.open').forEach(el => el.classList.remove('open'));
-    document.querySelectorAll('.dept-bar-line.open').forEach(el => el.classList.remove('open'));
+    document.querySelectorAll('.dept-dropdown.open').forEach(el=>el.classList.remove('open'));
+    document.querySelectorAll('.dept-bar-line.open').forEach(el=>el.classList.remove('open'));
     if (!isOpen) { drop.classList.add('open'); btn.classList.add('open'); }
   }
 
-  // ── TABLE ROW TOGGLE ─────────────────────────────────────────────────────
+  // ── TABLE ROW TOGGLE ───────────────────────────────────────────────────
   function toggleRow(btn) {
-    // Find the dropdown-inner in the NEXT tr
     const mainRow = btn.closest('tr.main-row');
     const dropRow = mainRow?.nextElementSibling;
     if (!dropRow || !dropRow.classList.contains('dropdown-row')) return;
     const inner = dropRow.querySelector('.dropdown-inner');
     if (!inner) return;
-
     const wasOpen = inner.classList.contains('open');
-    // Close all
-    document.querySelectorAll('.dropdown-inner.open').forEach(el => el.classList.remove('open'));
-    document.querySelectorAll('.pill-btn.open').forEach(el => el.classList.remove('open'));
+    document.querySelectorAll('.dropdown-inner.open').forEach(el=>el.classList.remove('open'));
+    document.querySelectorAll('.pill-btn.open, .dept-cell-btn.open').forEach(el=>el.classList.remove('open'));
     if (!wasOpen) { inner.classList.add('open'); btn.classList.add('open'); }
   }
 
-  // ── INIT ─────────────────────────────────────────────────────────────────
-  loadDashboard();
+  // ── INIT ───────────────────────────────────────────────────────────────
 
-  // Auto-refresh every 5 minutes
+  // ── PASSWORD GATE ───────────────────────────────────────────────────────
+  (function() {
+    const PASS = 'Skan@2026';
+    const SESSION_KEY = 'skan_auth';
+    if (sessionStorage.getItem(SESSION_KEY) === '1') {
+      document.getElementById('password-gate').style.display = 'none';
+      document.getElementById('dashboard-wrap').style.display = 'block';
+    }
+  })();
+
+  function checkPw() {
+    const input = document.getElementById('pwInput');
+    const error = document.getElementById('pwError');
+    if (input.value === 'Skan@2026') {
+      sessionStorage.setItem('skan_auth', '1');
+      document.getElementById('password-gate').style.display = 'none';
+      document.getElementById('dashboard-wrap').style.display = 'block';
+      loadDashboard();
+    } else {
+      input.classList.add('error');
+      error.textContent = 'Incorrect password. Please try again.';
+      input.value = '';
+      setTimeout(() => input.classList.remove('error'), 400);
+    }
+  }
+
+  // Auto-load only if already authenticated
+  if (sessionStorage.getItem('skan_auth') === '1') loadDashboard();
   setInterval(loadDashboard, 5 * 60 * 1000);
 </script>
+</div><!-- /dashboard-wrap -->
 </body>
 </html>
