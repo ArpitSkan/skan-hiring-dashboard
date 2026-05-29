@@ -79,6 +79,13 @@
   .insight-icon { font-size: 16px; }
   .insight-text { font-size: 12px; color: #bfdbfe; }
   .insight-text strong { color: #fff; font-size: 13px; }
+  .insight-item { position: relative; }
+  .info-btn { background: rgba(255,255,255,0.15); border: none; color: #bfdbfe; font-size: 11px; width: 16px; height: 16px; border-radius: 50%; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0; transition: background 0.15s; line-height: 1; padding: 0; font-family: serif; }
+  .info-btn:hover { background: rgba(255,255,255,0.3); }
+  .info-tooltip { display: none; position: absolute; top: calc(100% + 8px); left: 0; z-index: 999; background: #1e293b; color: #e2e8f0; font-size: 11.5px; padding: 10px 14px; border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,0.4); min-width: 220px; max-width: 280px; line-height: 1.5; border: 1px solid rgba(255,255,255,0.1); }
+  .info-tooltip::before { content: ''; position: absolute; top: -6px; left: 16px; width: 10px; height: 10px; background: #1e293b; border-left: 1px solid rgba(255,255,255,0.1); border-top: 1px solid rgba(255,255,255,0.1); transform: rotate(45deg); }
+  .info-tooltip.open { display: block; }
+  .info-tooltip strong { color: #93c5fd; display: block; margin-bottom: 4px; font-size: 12px; }
 
   /* PANELS */
   .panel { background: #fff; border-radius: 16px; padding: 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); }
@@ -407,6 +414,7 @@
       hrNames:    parseNames(r['HR Round Candidates']),
       preNames:   parseNames(r['Preboarding Candidates']),
       hiredNames: parseNames(r['Hired Candidates']),
+      coordinator: (r['Coordinator'] || '').replace(/\s+/g,' ').trim(),
       lastSync: r['Last updated'] || null,
     }));
   }
@@ -437,20 +445,52 @@
       .sort((a,b)=>b.count-a.count);
     const maxDeptCount = depts[0]?.count || 1;
 
+    // Tech vs Business split
+    const TECH_DEPTS = ['Engineering', 'Data Science'];
+    const techRoles = roles.filter(r => TECH_DEPTS.some(t => r.dept === t));
+    const bizRoles  = roles.filter(r => !TECH_DEPTS.some(t => r.dept === t));
+    const techHC    = techRoles.reduce((s,r)=>s+r.hc,0);
+    const bizHC     = bizRoles.reduce((s,r)=>s+r.hc,0);
+    const techHired = techRoles.reduce((s,r)=>s+r.hired,0);
+    const bizHired  = bizRoles.reduce((s,r)=>s+r.hired,0);
+    const techPipe  = techRoles.reduce((s,r)=>s+r.r1+r.r2+r.hr+r.pre,0);
+    const bizPipe   = bizRoles.reduce((s,r)=>s+r.r1+r.r2+r.hr+r.pre,0);
+
     const locMap = {};
     roles.forEach(r => { const l=r.location||'Remote/TBD'; if(!locMap[l]) locMap[l]={hc:0,hired:0,pipeline:0,roles:[]}; locMap[l].hc+=r.hc; locMap[l].hired+=r.hired; locMap[l].pipeline+=(r.r1+r.r2+r.hr+r.pre); locMap[l].roles.push(r); });
     const locs = Object.entries(locMap).map(([name,d])=>({name,...d})).sort((a,b)=>b.hc-a.hc);
     const maxLocHC = locs[0]?.hc || 1;
 
+    // Build set of all recruiter names (for coordinator filtering)
+    const recruiterNames = new Set(roles.map(r => (r.recruiter||'').trim().toLowerCase()).filter(Boolean));
+
+    // Build coordinating roles count per person (roles where they are coordinator)
+    const coordMap = {};
+    roles.forEach(r => {
+      if(r.coordinator && r.coordinator.trim()) {
+        const c = r.coordinator.trim();
+        if(!coordMap[c]) coordMap[c] = 0;
+        coordMap[c]++;
+      }
+    });
+
     const recMap = {};
     roles.forEach(r => {
       const rec = r.recruiter || 'Unassigned';
-      if(!recMap[rec]) recMap[rec]={hc:0,r1:0,r2:0,fh:0,hr:0,pre:0,hired:0,roles:[]};
+      if(!recMap[rec]) recMap[rec]={hc:0,r1:0,r2:0,fh:0,hr:0,pre:0,hired:0,roles:[],coords:new Set()};
       recMap[rec].hc+=r.hc; recMap[rec].r1+=r.r1; recMap[rec].r2+=r.r2; recMap[rec].fh+=r.fh;
       recMap[rec].hr+=r.hr; recMap[rec].pre+=r.pre; recMap[rec].hired+=r.hired;
       recMap[rec].roles.push(r);
+      // Only add coordinator if they are NOT themselves a recruiter in the system
+      if(r.coordinator && !recruiterNames.has(r.coordinator.trim().toLowerCase())) {
+        recMap[rec].coords.add(r.coordinator);
+      }
     });
-    const recruiters = Object.entries(recMap).map(([name,d])=>({name,...d})).sort((a,b)=>b.hc-a.hc);
+    const INTERNAL_TEAM = ['arpit mishra', 'hitesh reddy s', 'mikayla deming', 'divyashree a kumar'];
+    const recruiters = Object.entries(recMap)
+      .filter(([name]) => INTERNAL_TEAM.includes(name.trim().toLowerCase()))
+      .map(([name,d])=>({name,...d}))
+      .sort((a,b)=>b.hc-a.hc);
 
     // Roles with HR/Pre/Hired candidates
     const hrRoles  = roles.filter(r=>r.hrNames.length>0);
@@ -499,11 +539,36 @@
 
     const insightBar = `
       <div class="insight-bar">
-        <div class="insight-item"><span class="insight-icon">📈</span><div class="insight-text"><strong>${activeRate}%</strong> of open HC has active pipeline</div></div>
-        <div class="insight-item"><span class="insight-icon">✅</span><div class="insight-text"><strong>${convRate}%</strong> overall conversion rate (Hired/HC)</div></div>
-        <div class="insight-item"><span class="insight-icon">🏆</span><div class="insight-text">Top dept: <strong>${depts[0]?.name||'—'}</strong> with ${depts[0]?.count||0} HC</div></div>
-        <div class="insight-item"><span class="insight-icon">🔥</span><div class="insight-text"><strong>${totalR1+totalR2}</strong> candidates actively interviewing</div></div>
-        <div class="insight-item"><span class="insight-icon">🎯</span><div class="insight-text"><strong>${totalPre}</strong> in preboarding — almost hired!</div></div>
+        <div class="insight-item">
+          <span class="insight-icon">📈</span>
+          <div class="insight-text"><strong>${activeRate}%</strong> of open HC has active pipeline</div>
+          <button class="info-btn" onclick="toggleTooltip(this)">i</button>
+          <div class="info-tooltip"><strong>Active Pipeline Rate</strong>Shows what % of your total open headcount currently has at least one candidate in Round 1, Round 2, HR Round, or Preboarding. Higher = more roles being actively filled.</div>
+        </div>
+        <div class="insight-item">
+          <span class="insight-icon">✅</span>
+          <div class="insight-text"><strong>${convRate}%</strong> overall conversion rate (Hired/HC)</div>
+          <button class="info-btn" onclick="toggleTooltip(this)">i</button>
+          <div class="info-tooltip"><strong>Conversion Rate</strong>Total hired candidates divided by total open headcount. Shows how much of your hiring target has been fulfilled so far this cycle.</div>
+        </div>
+        <div class="insight-item">
+          <span class="insight-icon">🏆</span>
+          <div class="insight-text">Top dept: <strong>${depts[0]?.name||'—'}</strong> with ${depts[0]?.count||0} HC</div>
+          <button class="info-btn" onclick="toggleTooltip(this)">i</button>
+          <div class="info-tooltip"><strong>Top Department</strong>The department with the highest total headcount requirement. This team has the most open positions and likely needs the most hiring attention.</div>
+        </div>
+        <div class="insight-item">
+          <span class="insight-icon">🔥</span>
+          <div class="insight-text"><strong>${totalR1+totalR2}</strong> candidates actively interviewing</div>
+          <button class="info-btn" onclick="toggleTooltip(this)">i</button>
+          <div class="info-tooltip"><strong>Active Interviews</strong>Combined count of candidates currently in Round 1 and Round 2 across all roles. These are candidates in active evaluation — expect decisions soon.</div>
+        </div>
+        <div class="insight-item">
+          <span class="insight-icon">🎯</span>
+          <div class="insight-text"><strong>${totalPre}</strong> in preboarding — almost hired!</div>
+          <button class="info-btn" onclick="toggleTooltip(this)">i</button>
+          <div class="info-tooltip"><strong>Preboarding</strong>Candidates who have accepted an offer and are in the preboarding process. They are confirmed hires pending joining formalities.</div>
+        </div>
       </div>`;
 
     // ── OVERVIEW PAGE ──
@@ -512,6 +577,11 @@
       <div class="overview-grid">
         <div class="panel">
           <div class="panel-title">🎯 Pipeline Summary <span class="panel-subtitle">${pipeline} total in pipeline</span></div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid #f3f4f6">
+            <span style="background:#3b82f618;border:1px solid #3b82f633;border-radius:6px;padding:3px 9px;font-size:10.5px;color:#3b82f6;font-weight:500">📊 Bars show % of total HC</span>
+            <span style="background:#8b5cf618;border:1px solid #8b5cf633;border-radius:6px;padding:3px 9px;font-size:10.5px;color:#8b5cf6;font-weight:500">🎯 Wider bar = more candidates at that stage</span>
+            <span style="background:#22c55e18;border:1px solid #22c55e33;border-radius:6px;padding:3px 9px;font-size:10.5px;color:#22c55e;font-weight:500">✅ Hired = ${pct(totalHired,totalHC)} of target filled</span>
+          </div>
           ${[
             {label:'Round 1',    val:totalR1,    color:'#3b82f6'},
             {label:'Round 2',    val:totalR2,    color:'#a855f7'},
@@ -528,6 +598,10 @@
         </div>
         <div class="panel">
           <div class="panel-title">🏢 Headcount by Department <span class="panel-subtitle">${depts.length} departments</span></div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid #f3f4f6">
+            <span style="background:#3b6ef818;border:1px solid #3b6ef833;border-radius:6px;padding:3px 9px;font-size:10.5px;color:#3b6ef8;font-weight:500">📏 Bar width = HC as % of largest dept</span>
+            <span style="background:#f59e0b18;border:1px solid #f59e0b33;border-radius:6px;padding:3px 9px;font-size:10.5px;color:#f59e0b;font-weight:500">🏆 ${depts[0]?.name||'—'} has most open roles</span>
+          </div>
           ${depts.slice(0,8).map((d,i)=>`
             <div class="funnel-bar">
               <div class="funnel-label" style="font-size:11px;width:140px" title="${d.name}">${d.name.length>18?d.name.slice(0,18)+'…':d.name}</div>
@@ -539,6 +613,10 @@
       <div class="overview-grid-3">
         <div class="panel">
           <div class="panel-title">📍 Headcount by Location</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid #f3f4f6">
+            <span style="background:#3b82f618;border:1px solid #3b82f633;border-radius:6px;padding:3px 9px;font-size:10.5px;color:#3b82f6;font-weight:500">🌍 % shows share of total HC per location</span>
+            <span style="background:#10b98118;border:1px solid #10b98133;border-radius:6px;padding:3px 9px;font-size:10.5px;color:#10b981;font-weight:500">📍 ${locs[0]?.name||'—'} is the primary hiring hub</span>
+          </div>
           ${locs.slice(0,5).map((l,i)=>`
             <div class="funnel-bar">
               <div class="funnel-label" style="width:90px;font-size:11px">${l.name.length>12?l.name.slice(0,12)+'…':l.name}</div>
@@ -547,7 +625,11 @@
             </div>`).join('')}
         </div>
         <div class="panel">
-          <div class="panel-title">👤 Recruiter Load</div>
+          <div class="panel-title">👤 Sourcing Recruiter Load</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid #f3f4f6">
+            <span style="background:#3b6ef818;border:1px solid #3b6ef833;border-radius:6px;padding:3px 9px;font-size:10.5px;color:#3b6ef8;font-weight:500">📊 Bar = HC · Number = roles assigned</span>
+            <span style="background:#f59e0b18;border:1px solid #f59e0b33;border-radius:6px;padding:3px 9px;font-size:10.5px;color:#f59e0b;font-weight:500">⚖️ Avg ${recruiters.length?Math.round(totalHC/recruiters.length):0} HC per recruiter</span>
+          </div>
           ${recruiters.filter(r=>r.name!=='Unassigned').slice(0,5).map(rec=>`
             <div class="funnel-bar">
               <div class="funnel-label" style="width:110px;font-size:11px">${rec.name.split(' ')[0]}</div>
@@ -561,6 +643,112 @@
             <div class="mini-metric"><div class="mini-metric-val" style="color:#3b82f6">${totalR1+totalR2}</div><div class="mini-metric-lbl">Active Interviews</div><div class="mini-metric-trend trend-up">R1 + R2 combined</div></div>
             <div class="mini-metric"><div class="mini-metric-val" style="color:#10b981">${totalPre}</div><div class="mini-metric-lbl">Near Offer</div><div class="mini-metric-trend trend-up">In Preboarding</div></div>
             <div class="mini-metric"><div class="mini-metric-val" style="color:#f59e0b">${totalHired}</div><div class="mini-metric-lbl">Hired This Cycle</div><div class="mini-metric-trend" style="color:#6b7280">${convRate}% fill rate</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="overview-grid">
+        <div class="panel">
+          <div class="panel-title">💻 Tech vs 🏢 Business Roles</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid #f3f4f6">
+            <span style="background:#3b82f618;border:1px solid #3b82f633;border-radius:6px;padding:3px 9px;font-size:10.5px;color:#3b82f6;font-weight:500">💻 Tech = Engineering + Data Science + Platform</span>
+            <span style="background:#a855f718;border:1px solid #a855f733;border-radius:6px;padding:3px 9px;font-size:10.5px;color:#a855f7;font-weight:500">🏢 Business = Sales, Marketing, Customer, PMO etc.</span>
+            <span style="background:#6b728018;border:1px solid #6b728033;border-radius:6px;padding:3px 9px;font-size:10.5px;color:#6b7280;font-weight:500">👆 Click each card to see role breakdown</span>
+          </div>
+          <div style="display:flex;gap:16px;margin-bottom:20px">
+            <div style="flex:1;border:2px solid #bfdbfe;border-radius:12px;overflow:hidden">
+              <button onclick="toggleTechBiz(this,'tech')" style="width:100%;background:#eff6ff;border:none;cursor:pointer;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;font-family:inherit">
+                <div>
+                  <div style="font-size:11px;font-weight:700;color:#3b82f6;text-transform:uppercase;letter-spacing:0.5px;text-align:left">💻 Tech Roles</div>
+                  <div style="font-size:26px;font-weight:700;color:#1d4ed8;text-align:left">${techRoles.length}</div>
+                  <div style="font-size:11px;color:#6b7280;text-align:left">${techHC} HC · ${techHired} hired · ${pct(techHired,techHC)} fill rate</div>
+                </div>
+                <span class="tb-chev" style="font-size:11px;color:#9ca3af;transition:transform 0.25s">▼</span>
+              </button>
+              <div class="tb-drop" style="max-height:0;overflow:hidden;transition:max-height 0.35s ease;background:#fff">
+                <div style="padding:10px 14px 14px;display:flex;flex-direction:column;gap:6px">
+                  <div style="display:flex;justify-content:space-between;font-size:11px;padding:4px 0;border-bottom:1px solid #f3f4f6"><span style="color:#6b7280">Pipeline (R1+R2+HR+Pre)</span><span style="font-weight:600;color:#3b82f6">${techPipe}</span></div>
+                  <div style="display:flex;justify-content:space-between;font-size:11px;padding:4px 0;border-bottom:1px solid #f3f4f6"><span style="color:#6b7280">Hired</span><span style="font-weight:600;color:#22c55e">${techHired}</span></div>
+                  <div style="display:flex;justify-content:space-between;font-size:11px;padding:4px 0;border-bottom:1px solid #f3f4f6"><span style="color:#6b7280">Fill Rate</span><span style="font-weight:600;color:#f59e0b">${pct(techHired,techHC)}</span></div>
+                  <div style="font-size:10px;font-weight:700;color:#3b82f6;text-transform:uppercase;margin-top:6px;margin-bottom:4px">Roles</div>
+                  ${techRoles.map(r=>'<div style="font-size:11px;color:#374151;padding:3px 0;display:flex;justify-content:space-between"><span>'+r.name+'</span><span style="color:#9ca3af">'+r.dept+'</span></div>').join('')}
+                </div>
+              </div>
+            </div>
+            <div style="flex:1;border:2px solid #e9d5ff;border-radius:12px;overflow:hidden">
+              <button onclick="toggleTechBiz(this,'biz')" style="width:100%;background:#fdf4ff;border:none;cursor:pointer;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;font-family:inherit">
+                <div>
+                  <div style="font-size:11px;font-weight:700;color:#a855f7;text-transform:uppercase;letter-spacing:0.5px;text-align:left">🏢 Business Roles</div>
+                  <div style="font-size:26px;font-weight:700;color:#7e22ce;text-align:left">${bizRoles.length}</div>
+                  <div style="font-size:11px;color:#6b7280;text-align:left">${bizHC} HC · ${bizHired} hired · ${pct(bizHired,bizHC)} fill rate</div>
+                </div>
+                <span class="tb-chev" style="font-size:11px;color:#9ca3af;transition:transform 0.25s">▼</span>
+              </button>
+              <div class="tb-drop" style="max-height:0;overflow:hidden;transition:max-height 0.35s ease;background:#fff">
+                <div style="padding:10px 14px 14px;display:flex;flex-direction:column;gap:6px">
+                  <div style="display:flex;justify-content:space-between;font-size:11px;padding:4px 0;border-bottom:1px solid #f3f4f6"><span style="color:#6b7280">Pipeline (R1+R2+HR+Pre)</span><span style="font-weight:600;color:#a855f7">${bizPipe}</span></div>
+                  <div style="display:flex;justify-content:space-between;font-size:11px;padding:4px 0;border-bottom:1px solid #f3f4f6"><span style="color:#6b7280">Hired</span><span style="font-weight:600;color:#22c55e">${bizHired}</span></div>
+                  <div style="display:flex;justify-content:space-between;font-size:11px;padding:4px 0;border-bottom:1px solid #f3f4f6"><span style="color:#6b7280">Fill Rate</span><span style="font-weight:600;color:#f59e0b">${pct(bizHired,bizHC)}</span></div>
+                  <div style="font-size:10px;font-weight:700;color:#a855f7;text-transform:uppercase;margin-top:6px;margin-bottom:4px">Roles</div>
+                  ${bizRoles.map(r=>'<div style="font-size:11px;color:#374151;padding:3px 0;display:flex;justify-content:space-between"><span>'+r.name+'</span><span style="color:#9ca3af">'+r.dept+'</span></div>').join('')}
+                </div>
+              </div>
+            </div>
+          </div>
+          <div style="margin-bottom:10px">
+            <div style="font-size:11px;color:#6b7280;margin-bottom:6px;font-weight:600">Headcount Split</div>
+            <div style="display:flex;height:28px;border-radius:8px;overflow:hidden">
+              <div style="width:${pct(techHC,totalHC)};background:#3b82f6;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;min-width:40px">💻 ${pct(techHC,totalHC)}</div>
+              <div style="flex:1;background:#a855f7;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;min-width:40px">🏢 ${pct(bizHC,totalHC)}</div>
+            </div>
+          </div>
+          <div>
+            <div style="font-size:11px;color:#6b7280;margin-bottom:6px;font-weight:600">Pipeline Activity</div>
+            <div style="display:flex;height:18px;border-radius:6px;overflow:hidden">
+              <div style="width:${techPipe+bizPipe>0?((techPipe/(techPipe+bizPipe))*100).toFixed(1)+'%':'50%'};background:#3b82f6;opacity:0.8"></div>
+              <div style="flex:1;background:#a855f7;opacity:0.8"></div>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:10px;color:#6b7280;margin-top:4px">
+              <span>Tech: ${techPipe} in pipeline</span>
+              <span>Biz: ${bizPipe} in pipeline</span>
+            </div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">📊 Tech vs Business — Stage Breakdown</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid #f3f4f6">
+            <span style="background:#3b82f618;border:1px solid #3b82f633;border-radius:6px;padding:3px 9px;font-size:10.5px;color:#3b82f6;font-weight:500">💻 Blue bars = Tech · 🏢 Purple bars = Business</span>
+            <span style="background:#6b728018;border:1px solid #6b728033;border-radius:6px;padding:3px 9px;font-size:10.5px;color:#6b7280;font-weight:500">Wider bar = more candidates at that stage</span>
+          </div>
+          ${[
+            {label:'Round 1',  tech:techRoles.reduce((s,r)=>s+r.r1,0), biz:bizRoles.reduce((s,r)=>s+r.r1,0), color:'#3b82f6'},
+            {label:'Round 2',  tech:techRoles.reduce((s,r)=>s+r.r2,0), biz:bizRoles.reduce((s,r)=>s+r.r2,0), color:'#a855f7'},
+            {label:'HR Round', tech:techRoles.reduce((s,r)=>s+r.hr,0), biz:bizRoles.reduce((s,r)=>s+r.hr,0), color:'#8b5cf6'},
+            {label:'Preboard', tech:techRoles.reduce((s,r)=>s+r.pre,0),biz:bizRoles.reduce((s,r)=>s+r.pre,0),color:'#10b981'},
+            {label:'Hired',    tech:techHired, biz:bizHired, color:'#22c55e'},
+          ].map(s=>`
+            <div style="margin-bottom:14px">
+              <div style="display:flex;justify-content:space-between;margin-bottom:5px">
+                <span style="font-size:12px;font-weight:600;color:#374151">${s.label}</span>
+                <span style="font-size:11px;color:#6b7280">💻 ${s.tech} · 🏢 ${s.biz}</span>
+              </div>
+              <div style="display:flex;gap:4px">
+                <div style="flex:1">
+                  <div style="font-size:9px;color:#3b82f6;margin-bottom:2px">Tech</div>
+                  <div style="background:#f3f4f6;border-radius:4px;height:10px;overflow:hidden">
+                    <div style="width:${s.tech+s.biz>0?((s.tech/(s.tech+s.biz))*100).toFixed(1)+'%':'0%'};background:#3b82f6;height:100%;border-radius:4px"></div>
+                  </div>
+                </div>
+                <div style="flex:1">
+                  <div style="font-size:9px;color:#a855f7;margin-bottom:2px">Business</div>
+                  <div style="background:#f3f4f6;border-radius:4px;height:10px;overflow:hidden">
+                    <div style="width:${s.tech+s.biz>0?((s.biz/(s.tech+s.biz))*100).toFixed(1)+'%':'0%'};background:#a855f7;height:100%;border-radius:4px"></div>
+                  </div>
+                </div>
+              </div>
+            </div>`).join('')}
+          <div style="margin-top:16px;padding:12px;background:#f9fafb;border-radius:10px;font-size:11px;color:#6b7280;line-height:1.6">
+            💡 <strong style="color:#374151">Tech includes:</strong> Engineering, Data Science<br>
+            💡 <strong style="color:#374151">Business includes:</strong> All other departments
           </div>
         </div>
       </div>
@@ -614,6 +802,11 @@
       <div class="overview-grid">
         <div class="panel" style="grid-column:1">
           <div class="panel-title">🎯 Hiring Funnel — Stage by Stage</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid #f3f4f6">
+            <span style="background:#3b82f618;border:1px solid #3b82f633;border-radius:6px;padding:3px 9px;font-size:10.5px;color:#3b82f6;font-weight:500">📉 Narrowing bar = candidates dropping off at each stage</span>
+            <span style="background:#22c55e18;border:1px solid #22c55e33;border-radius:6px;padding:3px 9px;font-size:10.5px;color:#22c55e;font-weight:500">✅ % shows conversion relative to Round 1</span>
+            <span style="background:#f59e0b18;border:1px solid #f59e0b33;border-radius:6px;padding:3px 9px;font-size:10.5px;color:#f59e0b;font-weight:500">⚡ Arrows show stage-to-stage conversion rate</span>
+          </div>
           ${funnelStages.map((s,i)=>`
             <div class="stage-row" style="background:${s.color}18">
               <div class="stage-name">${s.icon} ${s.label}</div>
@@ -626,6 +819,10 @@
         <div style="display:flex;flex-direction:column;gap:16px">
           <div class="panel">
             <div class="panel-title">📊 Dept Pipeline Breakdown</div>
+            <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid #f3f4f6">
+              <span style="background:#3b82f618;border:1px solid #3b82f633;border-radius:6px;padding:3px 9px;font-size:10.5px;color:#3b82f6;font-weight:500">🔵 Blue = R1 &nbsp; 🟣 Purple = HR &nbsp; 🟢 Green = Pre/Hired</span>
+              <span style="background:#6b728018;border:1px solid #6b728033;border-radius:6px;padding:3px 9px;font-size:10.5px;color:#6b7280;font-weight:500">Bar width = % of dept HC with active candidates</span>
+            </div>
             ${depts.slice(0,6).map((d,i)=>`
               <div style="margin-bottom:12px">
                 <div style="display:flex;justify-content:space-between;margin-bottom:4px">
@@ -658,11 +855,37 @@
 
     // ── RECRUITER WORKLOAD PAGE ──
     document.getElementById('page-recruiter').innerHTML = statCards + `
+      <div style="background:#fefce8;border:1px solid #fde68a;border-radius:10px;padding:12px 16px;display:flex;align-items:flex-start;gap:10px;font-size:12px;color:#92400e">
+        <span style="font-size:16px;flex-shrink:0">ℹ️</span>
+        <div>
+          <strong>Two-recruiter setup:</strong> Each role may have two recruiters assigned in Keka. <strong>Sourcing Recruiter</strong> handles end-to-end candidate sourcing, screening &amp; process management. <strong>Process Coordinator</strong> (from internal team) manages scheduling &amp; interview coordination — shown on each <strong>Recruiter card</strong> below when assigned.
+        </div>
+      </div>` + `
       <div class="insight-bar">
-        <div class="insight-item"><span class="insight-icon">👤</span><div class="insight-text"><strong>${recruiters.filter(r=>r.name!=='Unassigned').length}</strong> active recruiters</div></div>
-        <div class="insight-item"><span class="insight-icon">💼</span><div class="insight-text">Avg <strong>${recruiters.length?Math.round(totalHC/recruiters.length):0} HC</strong> per recruiter</div></div>
-        <div class="insight-item"><span class="insight-icon">🏆</span><div class="insight-text">Top performer: <strong>${recruiters[0]?.name||'—'}</strong> (${recruiters[0]?.hc||0} HC)</div></div>
-        <div class="insight-item"><span class="insight-icon">✅</span><div class="insight-text">Most hired: <strong>${[...recruiters].sort((a,b)=>b.hired-a.hired)[0]?.name||'—'}</strong></div></div>
+        <div class="insight-item">
+          <span class="insight-icon">👤</span>
+          <div class="insight-text"><strong>${recruiters.length}</strong> active recruiters</div>
+          <button class="info-btn" onclick="toggleTooltip(this)">i</button>
+          <div class="info-tooltip"><strong>Sourcing Recruiters</strong>Recruiters responsible for candidate sourcing — finding and screening candidates for open roles. Excludes unassigned roles.</div>
+        </div>
+        <div class="insight-item">
+          <span class="insight-icon">💼</span>
+          <div class="insight-text">Avg <strong>${recruiters.length?Math.round(totalHC/recruiters.length):0} HC</strong> per recruiter</div>
+          <button class="info-btn" onclick="toggleTooltip(this)">i</button>
+          <div class="info-tooltip"><strong>Average Load</strong>Total open headcount divided by number of recruiters. Shows how much hiring responsibility each recruiter carries on average.</div>
+        </div>
+        <div class="insight-item">
+          <span class="insight-icon">🏆</span>
+          <div class="insight-text">Top performer: <strong>${recruiters[0]?.name||'—'}</strong> (${recruiters[0]?.hc||0} HC)</div>
+          <button class="info-btn" onclick="toggleTooltip(this)">i</button>
+          <div class="info-tooltip"><strong>Top by Headcount</strong>Recruiter managing the most headcount. Not necessarily the busiest — look at pipeline count for a fuller picture.</div>
+        </div>
+        <div class="insight-item">
+          <span class="insight-icon">✅</span>
+          <div class="insight-text">Most hired: <strong>${[...recruiters].sort((a,b)=>b.hired-a.hired)[0]?.name||'—'}</strong></div>
+          <button class="info-btn" onclick="toggleTooltip(this)">i</button>
+          <div class="info-tooltip"><strong>Most Successful</strong>Recruiter with the highest number of confirmed hires this cycle. A strong indicator of pipeline quality and closing ability.</div>
+        </div>
       </div>
       <div class="recruiter-grid">
         ${recruiters.map(rec=>{
@@ -674,12 +897,33 @@
               <div class="recruiter-avatar">${initials(rec.name)}</div>
               ${rec.name}
             </div>
+            ${rec.coords && rec.coords.size ? `<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px">${[...rec.coords].map(c=>`<span style="display:inline-flex;align-items:center;gap:5px;background:#f5f3ff;border:1px solid #ddd6fe;border-radius:999px;padding:3px 10px;font-size:11px;color:#7c3aed;font-weight:500"><span style="font-size:10px;opacity:0.7">🔗</span>${c}</span>`).join('')}</div>` : ''}
             <div class="recruiter-stats">
               <div class="r-stat"><div class="r-stat-val">${rec.hc}</div><div class="r-stat-lbl">Headcount</div></div>
               <div class="r-stat"><div class="r-stat-val" style="color:#22c55e">${rec.hired}</div><div class="r-stat-lbl">Hired</div></div>
               <div class="r-stat"><div class="r-stat-val" style="color:#3b82f6">${rec.r1}</div><div class="r-stat-lbl">Round 1</div></div>
               <div class="r-stat"><div class="r-stat-val" style="color:#8b5cf6">${rec.hr}</div><div class="r-stat-lbl">HR Round</div></div>
             </div>
+            <div style="display:flex;gap:10px;margin-bottom:10px;flex-wrap:wrap">
+              <button onclick="toggleRecDrop(this)" data-drop="jobs-${rec.name.replace(/\s+/g,'-')}"
+                style="background:#f0f9ff;border:1px solid #bae6fd;border-radius:8px;padding:4px 12px;font-size:11px;font-weight:600;color:#0369a1;cursor:pointer;display:flex;align-items:center;gap:5px">
+                📋 ${rec.roles.length} job${rec.roles.length!==1?'s':''} assigned <span style="font-size:9px;opacity:0.6">▼</span>
+              </button>
+              ${coordMap[rec.name] ? `
+              <button onclick="toggleRecDrop(this)" data-drop="coord-${rec.name.replace(/\s+/g,'-')}"
+                style="background:#f5f3ff;border:1px solid #ddd6fe;border-radius:8px;padding:4px 12px;font-size:11px;font-weight:600;color:#7c3aed;cursor:pointer;display:flex;align-items:center;gap:5px">
+                🔗 Coordinating ${coordMap[rec.name]} role${coordMap[rec.name]!==1?'s':''} <span style="font-size:9px;opacity:0.6">▼</span>
+              </button>` : ''}
+            </div>
+            <div id="jobs-${rec.name.replace(/\s+/g,'-')}" style="display:none;background:#f0f9ff;border:1px solid #bae6fd;border-radius:10px;padding:10px 14px;margin-bottom:10px">
+              <div style="font-size:10px;font-weight:700;color:#0369a1;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Jobs Assigned</div>
+              ${rec.roles.map(r=>`<div style="font-size:11.5px;color:#374151;padding:3px 0;border-bottom:1px solid #e0f2fe;display:flex;justify-content:space-between;align-items:center"><span>› ${r.name}</span><span style="font-size:10px;color:#6b7280">${r.location||''}</span></div>`).join('')}
+            </div>
+            ${coordMap[rec.name] ? `
+            <div id="coord-${rec.name.replace(/\s+/g,'-')}" style="display:none;background:#f5f3ff;border:1px solid #ddd6fe;border-radius:10px;padding:10px 14px;margin-bottom:10px">
+              <div style="font-size:10px;font-weight:700;color:#7c3aed;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Coordinating Roles</div>
+              ${roles.filter(r=>r.coordinator===rec.name).map(r=>`<div style="font-size:11.5px;color:#374151;padding:3px 0;border-bottom:1px solid #ede9fe;display:flex;justify-content:space-between;align-items:center"><span>› ${r.name}</span><span style="font-size:10px;color:#6b7280">${r.location||''}</span></div>`).join('')}
+            </div>` : ''}
             <div class="recruiter-pipeline">
               ${[{l:'R1',v:rec.r1,c:'#3b82f6'},{l:'R2',v:rec.r2,c:'#a855f7'},{l:'HR',v:rec.hr,c:'#8b5cf6'},{l:'Pre',v:rec.pre,c:'#10b981'}].map(p=>`
                 <div class="rec-pipe-bar">
@@ -689,7 +933,7 @@
                 </div>`).join('')}
             </div>
             <div class="recruiter-insight">
-              <strong>${recConv}%</strong> fill rate · <strong>${rec.roles.length}</strong> roles · Pipeline: <strong>${rec.r1+rec.r2+rec.hr+rec.pre}</strong>
+              <strong>${recConv}%</strong> fill rate &nbsp;·&nbsp; Pipeline: <strong>${rec.r1+rec.r2+rec.hr+rec.pre}</strong>
             </div>
           </div>`;
         }).join('')}
@@ -698,14 +942,38 @@
     // ── LOCATION BREAKDOWN PAGE ──
     document.getElementById('page-location').innerHTML = statCards + `
       <div class="insight-bar">
-        <div class="insight-item"><span class="insight-icon">📍</span><div class="insight-text"><strong>${locs.length}</strong> hiring locations</div></div>
-        <div class="insight-item"><span class="insight-icon">🏆</span><div class="insight-text">Largest: <strong>${locs[0]?.name||'—'}</strong> (${locs[0]?.hc||0} HC)</div></div>
-        <div class="insight-item"><span class="insight-icon">🌍</span><div class="insight-text">International: <strong>${locs.filter(l=>!['India','Bengaluru','Bangalore'].some(x=>l.name.includes(x))).reduce((s,l)=>s+l.hc,0)}</strong> HC</div></div>
-        <div class="insight-item"><span class="insight-icon">📈</span><div class="insight-text">Most pipeline: <strong>${[...locs].sort((a,b)=>b.pipeline-a.pipeline)[0]?.name||'—'}</strong></div></div>
+        <div class="insight-item">
+          <span class="insight-icon">📍</span>
+          <div class="insight-text"><strong>${locs.length}</strong> hiring locations</div>
+          <button class="info-btn" onclick="toggleTooltip(this)">i</button>
+          <div class="info-tooltip"><strong>Hiring Locations</strong>Total number of distinct cities or countries where Skan AI has open roles. Reflects the geographic spread of hiring activity.</div>
+        </div>
+        <div class="insight-item">
+          <span class="insight-icon">🏆</span>
+          <div class="insight-text">Largest: <strong>${locs[0]?.name||'—'}</strong> (${locs[0]?.hc||0} HC)</div>
+          <button class="info-btn" onclick="toggleTooltip(this)">i</button>
+          <div class="info-tooltip"><strong>Largest Location</strong>The city or country with the most open headcount. This location is the primary hiring hub for this cycle.</div>
+        </div>
+        <div class="insight-item">
+          <span class="insight-icon">🌍</span>
+          <div class="insight-text">International: <strong>${locs.filter(l=>!['India','Bengaluru','Bangalore'].some(x=>l.name.includes(x))).reduce((s,l)=>s+l.hc,0)}</strong> HC</div>
+          <button class="info-btn" onclick="toggleTooltip(this)">i</button>
+          <div class="info-tooltip"><strong>International Headcount</strong>Total open positions outside India. Includes USA, UK, Canada, and other global locations.</div>
+        </div>
+        <div class="insight-item">
+          <span class="insight-icon">📈</span>
+          <div class="insight-text">Most pipeline: <strong>${[...locs].sort((a,b)=>b.pipeline-a.pipeline)[0]?.name||'—'}</strong></div>
+          <button class="info-btn" onclick="toggleTooltip(this)">i</button>
+          <div class="info-tooltip"><strong>Most Active Pipeline</strong>Location with the most candidates currently in interview stages. This location has the most hiring momentum right now.</div>
+        </div>
       </div>
       <div class="location-grid">
         <div class="panel">
           <div class="panel-title">📍 Headcount by Location</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid #f3f4f6">
+            <span style="background:#3b82f618;border:1px solid #3b82f633;border-radius:6px;padding:3px 9px;font-size:10.5px;color:#3b82f6;font-weight:500">📊 Bar = headcount · % = share of total hiring</span>
+            <span style="background:#10b98118;border:1px solid #10b98133;border-radius:6px;padding:3px 9px;font-size:10.5px;color:#10b981;font-weight:500">🏆 Largest hiring hub: ${locs[0]?.name||'—'} (${locs[0]?.hc||0} HC)</span>
+          </div>
           ${locs.map((l,i)=>`
             <div class="loc-bar-row">
               <div class="loc-label">${l.name}</div>
@@ -720,6 +988,10 @@
         <div style="display:flex;flex-direction:column;gap:16px">
           <div class="panel">
             <div class="panel-title">📊 Pipeline by Location</div>
+            <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid #f3f4f6">
+              <span style="background:#3b82f618;border:1px solid #3b82f633;border-radius:6px;padding:3px 9px;font-size:10.5px;color:#3b82f6;font-weight:500">🔵 Blue = candidates in pipeline &nbsp; 🟢 Green = hired</span>
+              <span style="background:#6b728018;border:1px solid #6b728033;border-radius:6px;padding:3px 9px;font-size:10.5px;color:#6b7280;font-weight:500">Longer bar = more active hiring activity</span>
+            </div>
             ${locs.map((l,i)=>`
               <div style="margin-bottom:12px">
                 <div style="display:flex;justify-content:space-between;margin-bottom:4px">
@@ -756,12 +1028,19 @@
     // ── ALL ROLES PAGE ──
     const uniqueDepts = [...new Set(roles.map(r=>r.dept))].sort();
     const uniqueLocs  = [...new Set(roles.map(r=>r.location))].sort();
-    const uniqueRecs  = [...new Set(roles.map(r=>r.recruiter||'Unassigned'))].sort();
+    const VALID_RECS = ['arpit mishra', 'hitesh reddy s', 'mikayla deming', 'divyashree a kumar', 'external vendor'];
+    const uniqueRecs = [...new Set(roles.map(r=>r.recruiter||'Unassigned'))]
+      .filter(r => VALID_RECS.includes(r.toLowerCase()) || r === 'Unassigned')
+      .sort();
 
     document.getElementById('page-allroles').innerHTML = statCards + `
       <div class="content-row">
         <div class="chart-panel">
           <div class="chart-panel-header"><div class="chart-panel-title">🏢 Open Roles by Department</div></div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;padding:0 16px 10px;border-bottom:1px solid rgba(255,255,255,0.07);margin-bottom:4px">
+            <span style="background:rgba(59,182,248,0.1);border:1px solid rgba(59,182,248,0.2);border-radius:6px;padding:3px 9px;font-size:10.5px;color:#93c5fd;font-weight:500">📊 Bar = headcount by department</span>
+            <span style="background:rgba(99,255,132,0.1);border:1px solid rgba(99,255,132,0.2);border-radius:6px;padding:3px 9px;font-size:10.5px;color:#86efac;font-weight:500">👆 Click dept name to see all roles in it</span>
+          </div>
           <div class="chart-body">
             ${depts.map((d,i)=>{
               const pctVal=(d.count/maxDeptCount*100).toFixed(1);
@@ -817,15 +1096,13 @@
                 <tr>
                   <th style="width:34px">#</th>
                   <th>Role Name</th>
-                  <th>Department</th>
+                  <th>Dept</th>
                   <th>Location</th>
                   <th>Recruiter</th>
                   <th class="num">HC</th>
-                  <th class="num">R1</th>
-                  <th class="num">R2</th>
-                  <th class="num">FH</th>
+                  <th class="num">Pipeline</th>
                   <th class="num">HR</th>
-                  <th class="num">Preboard</th>
+                  <th class="num">Pre</th>
                   <th class="num">Hired</th>
                 </tr>
               </thead>
@@ -856,18 +1133,16 @@
                     <tr class="main-row" data-dept="${r.dept}" data-loc="${r.location}" data-rec="${r.recruiter||'Unassigned'}">
                       <td class="row-num">${r.id}</td>
                       <td class="role-name">${r.name}</td>
-                      <td><button class="dept-cell-btn" onclick="toggleRow(this)"><span style="color:#9ca3af;font-size:11.5px">${r.dept}</span><span class="dept-cell-chevron">▼</span></button></td>
+                      <td><span style="color:#9ca3af;font-size:11px;line-height:1.3">${r.dept}</span></td>
                       <td class="location">${r.location}</td>
                       <td>${r.recruiter?`<span class="recruiter-name">${r.recruiter}</span>`:`<span class="recruiter-unassigned">Unassigned</span>`}</td>
                       <td class="num-cell"><span class="pill pill-hc">${r.hc}</span></td>
-                      <td class="num-cell">${r.r1?`<span class="pill pill-r1">${r.r1}</span>`:`<span class="dash">—</span>`}</td>
-                      <td class="num-cell">${r.r2?`<span class="pill pill-r2">${r.r2}</span>`:`<span class="dash">—</span>`}</td>
-                      <td class="num-cell">${r.fh?`<span class="pill pill-fh">${r.fh}</span>`:`<span class="dash">—</span>`}</td>
+                      <td class="num-cell"><span style="font-size:11px;color:#6b7280">${[r.r1?`R1:<b style="color:#3b82f6">${r.r1}</b>`:'', r.r2?`R2:<b style="color:#a855f7">${r.r2}</b>`:'', r.fh?`FH:<b style="color:#f59e0b">${r.fh}</b>`:''].filter(Boolean).join(' ') || '<span class="dash">—</span>'}</span></td>
                       <td class="num-cell">${hrBtn}</td>
                       <td class="num-cell">${preBtn}</td>
                       <td class="num-cell">${hireBtn}</td>
                     </tr>
-                    <tr class="dropdown-row"><td colspan="12"><div class="dropdown-inner"><div class="dropdown-content">${dropSections}</div></div></td></tr>`;
+                    <tr class="dropdown-row"><td colspan="10"><div class="dropdown-inner"><div class="dropdown-content">${dropSections}</div></div></td></tr>`;
                 }).join('')}
               </tbody>
             </table>
@@ -913,7 +1188,51 @@
     });
   }
 
+  // ── TECH/BIZ DROPDOWN ──
+  function toggleTechBiz(btn, key) {
+    const drop = btn.nextElementSibling;
+    const chev = btn.querySelector(".tb-chev");
+    const isOpen = drop.style.maxHeight && drop.style.maxHeight !== "0px";
+    // Close all tb-drops first
+    document.querySelectorAll(".tb-drop").forEach(d => d.style.maxHeight = "0px");
+    document.querySelectorAll(".tb-chev").forEach(c => c.style.transform = "rotate(0deg)");
+    if (!isOpen) {
+      drop.style.maxHeight = drop.scrollHeight + 600 + "px";
+      if (chev) chev.style.transform = "rotate(180deg)";
+    }
+  }
+
+  // ── TOOLTIP TOGGLE ──
+  function toggleTooltip(btn) {
+    const tooltip = btn.nextElementSibling;
+    if (!tooltip || !tooltip.classList.contains("info-tooltip")) return;
+    const isOpen = tooltip.classList.contains("open");
+    // Close all tooltips
+    document.querySelectorAll(".info-tooltip.open").forEach(t => t.classList.remove("open"));
+    if (!isOpen) tooltip.classList.add("open");
+  }
+  // Close tooltips when clicking outside
+  document.addEventListener("click", function(e) {
+    if (!e.target.classList.contains("info-btn")) {
+      document.querySelectorAll(".info-tooltip.open").forEach(t => t.classList.remove("open"));
+    }
+  });
+
   // ── STAT CARD DROPDOWN ──
+  function toggleRecDrop(btn) {
+    const id = btn.getAttribute('data-drop');
+    const el = document.getElementById(id);
+    if (!el) return;
+    const isOpen = el.style.display !== 'none';
+    document.querySelectorAll('[id^="jobs-"],[id^="coord-"]').forEach(d => d.style.display='none');
+    document.querySelectorAll('[data-drop] span:last-child').forEach(s => s.textContent='▼');
+    if (!isOpen) {
+      el.style.display = 'block';
+      const chev = btn.querySelector('span:last-child');
+      if (chev) chev.textContent = '▲';
+    }
+  }
+
   function toggleStatDropdown(card, key) {
     const drop = card.querySelector('.stat-dropdown');
     const chev = card.querySelector('.stat-chev');
