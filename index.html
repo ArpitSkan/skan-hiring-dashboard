@@ -464,13 +464,15 @@
     // Build set of all recruiter names (for coordinator filtering)
     const recruiterNames = new Set(roles.map(r => (r.recruiter||'').trim().toLowerCase()).filter(Boolean));
 
-    // Build coordinating roles count per person (roles where they are coordinator)
+    // Build coordinating roles count + HC per person (roles where they are coordinator)
     const coordMap = {};
+    const coordHC = {};
     roles.forEach(r => {
       if(r.coordinator && r.coordinator.trim()) {
         const c = r.coordinator.trim();
-        if(!coordMap[c]) coordMap[c] = 0;
+        if(!coordMap[c]) { coordMap[c] = 0; coordHC[c] = 0; }
         coordMap[c]++;
+        coordHC[c] += r.hc;
       }
     });
 
@@ -899,10 +901,11 @@
             </div>
             ${rec.coords && rec.coords.size ? `<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px">${[...rec.coords].map(c=>`<span style="display:inline-flex;align-items:center;gap:5px;background:#f5f3ff;border:1px solid #ddd6fe;border-radius:999px;padding:3px 10px;font-size:11px;color:#7c3aed;font-weight:500"><span style="font-size:10px;opacity:0.7">🔗</span>${c}</span>`).join('')}</div>` : ''}
             <div class="recruiter-stats">
-              <div class="r-stat"><div class="r-stat-val">${rec.hc}</div><div class="r-stat-lbl">Headcount</div></div>
-              <div class="r-stat"><div class="r-stat-val" style="color:#22c55e">${rec.hired}</div><div class="r-stat-lbl">Hired</div></div>
-              <div class="r-stat"><div class="r-stat-val" style="color:#3b82f6">${rec.r1}</div><div class="r-stat-lbl">Round 1</div></div>
+              <div class="r-stat"><div class="r-stat-val" style="color:#3b6ef8">${rec.roles.length}</div><div class="r-stat-lbl">Jobs</div></div>
+              <div class="r-stat" title="Assigned HC: ${rec.hc}${coordHC[rec.name]?' + Coordinating HC: '+coordHC[rec.name]:''}"><div class="r-stat-val" style="color:#1e293b">${rec.hc + (coordHC[rec.name]||0)}</div><div class="r-stat-lbl">Headcount</div></div>
               <div class="r-stat"><div class="r-stat-val" style="color:#8b5cf6">${rec.hr}</div><div class="r-stat-lbl">HR Round</div></div>
+              <div class="r-stat"><div class="r-stat-val" style="color:#10b981">${rec.pre}</div><div class="r-stat-lbl">Preboarding</div></div>
+              <div class="r-stat"><div class="r-stat-val" style="color:#22c55e">${rec.hired}</div><div class="r-stat-lbl">Hired</div></div>
             </div>
             <div style="display:flex;gap:10px;margin-bottom:10px;flex-wrap:wrap">
               <button onclick="toggleRecDrop(this)" data-drop="jobs-${rec.name.replace(/\s+/g,'-')}"
