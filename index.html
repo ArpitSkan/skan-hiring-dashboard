@@ -414,7 +414,17 @@
       hrNames:    parseNames(r['HR Round Candidates']),
       preNames:   parseNames(r['Preboarding Candidates']),
       hiredNames: parseNames(r['Hired Candidates']),
-      coordinator: (r['Coordinator'] || '').replace(/\s+/g,' ').trim(),
+      coordinator: (function() {
+        const COORDINATORS = ['arpit mishra', 'hitesh reddy s'];
+        const coord = (r['Coordinator'] || '').replace(/\s+/g,' ').trim();
+        const rec   = (r['Recruiter']   || '').replace(/\s+/g,' ').trim().toLowerCase();
+        if (!coord) return '';
+        // Only show coordinator if they are Arpit or Hitesh
+        if (!COORDINATORS.includes(coord.toLowerCase())) return '';
+        // Don't show if same as recruiter
+        if (coord.toLowerCase() === rec) return '';
+        return coord;
+      })(),
       lastSync: r['Last updated'] || null,
     }));
   }
