@@ -488,9 +488,9 @@
         recMap[rec].coords.add(r.coordinator);
       }
     });
-    const INTERNAL_TEAM = ['arpit mishra', 'hitesh reddy s', 'mikayla deming', 'divyashree a kumar'];
+    const INTERNAL_TEAM = ['arpit mishra', 'hitesh reddy s', 'mikayla deming', 'divyashree a kumar', 'adnan haider', 'tanesha', 'tasha'];
     const recruiters = Object.entries(recMap)
-      .filter(([name]) => INTERNAL_TEAM.includes(name.trim().toLowerCase()))
+      .filter(([name]) => INTERNAL_TEAM.some(t => name.trim().toLowerCase().includes(t)))
       .map(([name,d])=>({name,...d}))
       .sort((a,b)=>b.hc-a.hc);
 
