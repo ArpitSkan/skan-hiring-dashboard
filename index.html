@@ -1041,9 +1041,8 @@
     // ── ALL ROLES PAGE ──
     const uniqueDepts = [...new Set(roles.map(r=>r.dept))].sort();
     const uniqueLocs  = [...new Set(roles.map(r=>r.location))].sort();
-    const VALID_RECS = ['arpit mishra', 'hitesh reddy s', 'mikayla deming', 'divyashree a kumar', 'external vendor'];
     const uniqueRecs = [...new Set(roles.map(r=>r.recruiter||'Unassigned'))]
-      .filter(r => VALID_RECS.includes(r.toLowerCase()) || r === 'Unassigned')
+      .filter(r => r && r !== 'Unassigned')
       .sort();
 
     document.getElementById('page-allroles').innerHTML = statCards + `
