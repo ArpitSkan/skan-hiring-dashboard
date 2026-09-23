@@ -340,6 +340,15 @@
   const BAR_COLORS = ['#1e3a5f','#2563eb','#3b82f6','#0d9488','#7c3aed','#16a34a','#d97706','#dc2626','#0f766e','#9333ea','#374151','#b45309'];
   let ROLES = [];
 
+  const INTERNAL_RECRUITERS = ['arpit mishra', 'hitesh reddy s'];
+  const RPO_RECRUITERS = ['tasha smith', 'tanesha mccoy-washington', "lauren o'neill", 'garrett walsh'];
+  function getRecruiterType(name) {
+    const n = (name || '').trim().toLowerCase();
+    if (INTERNAL_RECRUITERS.some(r => n.includes(r))) return 'Internal';
+    if (RPO_RECRUITERS.some(r => n.includes(r))) return 'RPO';
+    return 'Other';
+  }
+
   // ── PARSE NAMES ──
   // Handles formats from Power Automate/Excel:
   // - {"":"John Doe"}, {"":"Jane Smith"}   (empty key objects, comma separated)
@@ -912,6 +921,7 @@
             <div class="recruiter-name-head">
               <div class="recruiter-avatar">${initials(rec.name)}</div>
               ${rec.name}
+              <span style="margin-left:auto;font-size:10px;font-weight:700;padding:2px 9px;border-radius:999px;${getRecruiterType(rec.name)==='Internal' ? 'background:#dbeafe;color:#1d4ed8;' : getRecruiterType(rec.name)==='RPO' ? 'background:#fef3c7;color:#92400e;' : 'background:#f3f4f6;color:#6b7280;'}">${getRecruiterType(rec.name)}</span>
             </div>
             ${rec.coords && rec.coords.size ? `<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px">${[...rec.coords].map(c=>`<span style="display:inline-flex;align-items:center;gap:5px;background:#f5f3ff;border:1px solid #ddd6fe;border-radius:999px;padding:3px 10px;font-size:11px;color:#7c3aed;font-weight:500"><span style="font-size:10px;opacity:0.7">🔗</span>${c}</span>`).join('')}</div>` : ''}
             <div class="recruiter-stats">
