@@ -341,7 +341,7 @@
   let ROLES = [];
 
   const INTERNAL_RECRUITERS = ['arpit mishra', 'hitesh reddy s'];
-  const RPO_RECRUITERS = ['tasha smith', 'tanesha mccoy-washington', "lauren o'neill", 'garrett walsh'];
+  const RPO_RECRUITERS = ['tasha smith', 'tanesha mccoy-washington', "lauren o'neill", 'garrett walsh', 'colleen'];
   function getRecruiterType(name) {
     const n = (name || '').trim().toLowerCase();
     if (INTERNAL_RECRUITERS.some(r => n.includes(r))) return 'Internal';
@@ -511,7 +511,7 @@
         recMap[rec].coords.add(r.coordinator);
       }
     });
-    const INTERNAL_TEAM = ['arpit mishra', 'hitesh reddy s', 'mikayla deming', 'divyashree a kumar', 'adnan haider', 'tanesha', 'tasha', 'lauren', 'garrett'];
+    const INTERNAL_TEAM = ['arpit mishra', 'hitesh reddy s', 'mikayla deming', 'divyashree a kumar', 'adnan haider', 'tanesha', 'tasha', 'lauren', 'garrett', 'colleen'];
     const recruiters = Object.entries(recMap)
       .filter(([name]) => INTERNAL_TEAM.some(t => name.trim().toLowerCase().includes(t)))
       .map(([name,d])=>({name,...d}))
